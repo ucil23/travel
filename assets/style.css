@@ -87,36 +87,25 @@ video {
   font: inherit;
   vertical-align: baseline;
 }
-
-/* Box sizing */
 html {
   box-sizing: border-box;
 }
-
 *,
 *::before,
 *::after {
   box-sizing: inherit;
 }
-
-/* Remove list styles */
 ol,
 ul {
   list-style: none;
 }
-
-/* Remove default links styles */
 a {
   text-decoration: none;
 }
-
-/* Remove default table styles */
 table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-
-/* Remove default button styles */
 button,
 input,
 optgroup,
@@ -126,39 +115,164 @@ textarea {
   font-size: inherit;
   line-height: inherit;
 }
-
-/* Remove default button styles (for IE) */
 button,
 input {
   overflow: visible;
 }
-
-/* Remove default fieldset styles */
 fieldset {
   border: 0;
   margin: 0;
   padding: 0;
 }
-
-/* Remove default form styles */
 form {
   margin: 0;
   padding: 0;
 }
-
-/* Remove default margin and padding for the root element */
 :root {
   margin: 0;
   padding: 0;
 }
-
-/* Remove default margin and padding for the body element */
 body {
   margin: 0;
   padding: 0;
 }
+/* Poppins Regular */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
 
-/* Typography */
+/* Poppins Bold */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Poppins Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* Poppins Bold Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-BoldItalic.ttf") format("truetype");
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* Poppins ExtraLight */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+/* Poppins ExtraLight Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-ExtraLightItalic.ttf") format("truetype");
+  font-weight: 200;
+  font-style: italic;
+}
+
+/* Poppins Light */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Poppins Light Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-LightItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* Poppins Medium */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Poppins Medium Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Poppins SemiBold */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Poppins SemiBold Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-SemiBoldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-style: italic;
+}
+
+/* Poppins Bold */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Poppins ExtraBold */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+/* Poppins ExtraBold Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-ExtraBoldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* Poppins Thin */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+}
+
+/* Poppins Thin Italic */
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/Poppins-ThinItalic.ttf") format("truetype");
+  font-weight: 100;
+  font-style: italic;
+}
+
+/* Apply font-family to body */
 body {
   font-family: "Poppins", sans-serif;
   font-size: 16px;
@@ -173,82 +287,66 @@ h3,
 h4,
 h5,
 h6 {
-  font-weight: bold;
+  font-weight: 700;
   margin-bottom: 1rem;
 }
-
 p {
   margin-bottom: 1rem;
 }
-
 a {
   color: #007bff;
   text-decoration: none;
 }
-
 a:hover {
   text-decoration: underline;
 }
-
 ul,
 ol {
   margin-bottom: 1rem;
   list-style: none;
 }
-
-/* Additional typography styles */
 h1 {
   font-size: 3rem;
   line-height: 1.2;
 }
-
 h2 {
   font-size: 2.5rem;
   line-height: 1.2;
 }
-
 h3 {
   font-size: 2rem;
   line-height: 1.2;
 }
-
 h4 {
   font-size: 1.5rem;
   line-height: 1.2;
 }
-
 h5 {
   font-size: 1.2rem;
   line-height: 1.2;
 }
-
 h6 {
   font-size: 1rem;
   line-height: 1.2;
 }
-
 p {
   margin-bottom: 1rem;
 }
-
 blockquote {
   font-style: italic;
   border-left: 4px solid #ccc;
   padding-left: 1rem;
 }
-
 code,
 pre {
   font-family: "Courier New", monospace;
 }
-
 code {
   font-size: 0.85rem;
   padding: 4px 6px;
   background-color: #f1f1f1;
   border-radius: 4px;
 }
-
 pre {
   white-space: pre-wrap;
   background-color: #f1f1f1;
@@ -297,12 +395,11 @@ pre {
   backface-visibility: hidden;
 
   transform: translateZ(0);
-  background: #1b2030
-    url(https://images.unsplash.com/photo-1571993142257-eae0b44cf0f1?ixlib=rb-1.2.1&q=85&fm=jpg&crop=entropy&cs=srgb&ixid=eyJhcHBfaWQiOjE0NTg5fQ)
-    50% 0 no-repeat;
+  background: #1b2030 url(/assets/photo-1571993142257-eae0b44cf0f1.jfif) 50% 0
+    no-repeat;
   background-size: 100%;
   background-attachment: fixed;
-  animation: grow 60s linear 10ms infinite;
+  animation: grow 120s linear 10ms infinite;
   transition: all 0.4s ease-in-out;
   z-index: -2;
 }
@@ -362,6 +459,9 @@ pre {
 .info h2 {
   font-size: 1em;
   font-weight: 500;
+}
+.info h1 {
+  font-size: 4rem;
 }
 .author {
   display: inline-block;
@@ -429,8 +529,34 @@ pre {
   box-shadow: 2px 4px 5px rgba(0, 0, 0, 0.3);
   padding: 10px 15px;
 }
-.icon {
+.guide .icon {
   color: #007bff;
+  width: 50px;
+  height: 50px;
+  margin: 10px;
+}
+.guide .icon.rounded {
+  display: inline-block;
+  border: 3px solid #007bff;
+  padding: 2px;
+  border-radius: 50%;
+  padding: 10px;
+  height: 42px;
+  width: 42px;
+  margin: 10px;
+}
+.guide .ginfo .rounded {
+  display: inline-block;
+  border: 3px solid #007bff;
+  padding: 2px;
+  border-radius: 50%;
+  padding: 5px;
+  height: 42px;
+  width: 42px;
+  margin: 10px;
+}
+.guide .desc {
+  font-size: 0.8rem;
 }
 
 @media (max-width: 768px) {
@@ -561,4 +687,5 @@ pre {
   padding: 1rem;
   background-color: #efefef;
   text-align: center;
+  font-size: 0.8rem;
 }
