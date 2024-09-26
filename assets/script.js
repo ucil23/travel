@@ -11,7 +11,7 @@ const data = [
       id: 2,
       title: "Baluran Situbondo",
       title2: "Kawasan Taman Nasional",
-      slug: "/media/trenggalek",
+      slug: "/media/cmc",
       image: "/assets/images/baluran.jpg",
     },
     {
