@@ -6,6 +6,7 @@ const data = [
     title2: "Kawasan Taman Nasional",
     slug: "/media/bromo",
     image: "/assets/images/bromo.jpg",
+    location: "Probolinggo, Jawa Timur",
   },
   {
     id: 2,
@@ -13,6 +14,7 @@ const data = [
     title2: "Clungup Mangrove Conservation",
     slug: "/media/cmc",
     image: "/assets/images/cmc.jpg",
+    location: "Malang, Jawa Timur",
   },
   {
     id: 3,
@@ -20,6 +22,7 @@ const data = [
     title2: "Enviromental Issue",
     slug: "/media/bromo",
     image: "/assets/images/batu.jpg",
+    location: "Malang, Jawa Timur",
   },
 ];
 
@@ -50,17 +53,22 @@ data.forEach((item) => {
   // membuat element span
   const span = document.createElement("span");
   span.innerText = item.title2;
+  const span2 = document.createElement("span");
+  span2.innerText = item.location;
+  span2.classList.add("location");
   // menambahkan semua elemen ke card
   link.appendChild(img);
   link.appendChild(shadow);
   link.appendChild(span);
   link.appendChild(h3);
+  card.appendChild(span2);
   card.appendChild(link);
 
   card.addEventListener("click", async (event) => {
     event.preventDefault();
 
     card.classList.add("fixed");
+    span2.classList.add("hidden");
 
     // Bungkus setTimeout dalam Promise
     await new Promise((resolve) => {
@@ -71,6 +79,7 @@ data.forEach((item) => {
 
     window.location.href = item.slug;
     card.classList.remove("fixed");
+    span2.classList.remove("hidden");
   });
   // menambahkan semua card ke cards
   cards.appendChild(card);
