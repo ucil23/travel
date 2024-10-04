@@ -279,6 +279,7 @@ body {
   line-height: 1.5;
   color: #333;
   position: relative;
+  background: black;
 }
 
 h1,
@@ -360,12 +361,12 @@ pre {
   overflow: hidden;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: flex-start;
   align-content: flex-start;
-  height: 50vw;
+  height: 100vw;
   min-height: 400px;
-  max-height: 550px;
+  max-height: 100vh;
   min-width: 300px;
   color: #eee;
 }
@@ -379,8 +380,8 @@ pre {
   z-index: -1;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.12) 40%,
-    rgba(27, 32, 48, 1) 100%
+    rgba(0, 0, 0, 0.2) 40%,
+    rgba(0, 0, 0, 1) 100%
   );
 }
 .header:before {
@@ -406,6 +407,7 @@ pre {
 .header a {
   color: #eee;
 }
+
 .menu {
   display: block;
   width: 40px;
@@ -451,9 +453,9 @@ pre {
   width: 50%;
 }
 .info {
-  width: 100%;
-  padding: 15% 10% 0 10%;
-  text-align: center;
+  width: 40%;
+  padding: 10% 5% 5% 5%;
+  text-align: left;
   text-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
 }
 .info h2 {
@@ -499,13 +501,23 @@ pre {
   padding: 50px 30px;
   margin: 0 auto;
   max-width: 1024px;
-  padding-bottom: 150px;
+  padding-bottom: 180px;
   text-align: center;
+  color: white;
 }
 .content h2 {
-  border-bottom: 7px solid black;
-  padding-top: 30px;
-  display: inline-block;
+  display: inline;
+  background: black;
+}
+.content h2:before {
+  content: " ";
+  background: white;
+  width: 100%;
+  height: 8px;
+  display: block;
+  z-index: -1;
+  transform: translateY(30px);
+  position: relative;
 }
 .content p {
   line-height: 1.5;
@@ -514,49 +526,50 @@ pre {
 
 #cards {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  padding: 30px 0;
 }
-#guides {
+#buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  padding-top: 30px;
 }
-.guide {
-  width: 100%;
-  display: block;
-  border-radius: 20px;
+
+.button {
+  background: #222;
+  display: flex; /* Ubah menjadi flex */
+  align-items: center; /* Meratakan ikon dan teks secara vertikal */
+  justify-content: center; /* Meratakan ikon dan teks secara horizontal */
+  gap: 10px; /* Jarak antara ikon dan teks */
+  border-radius: 10px;
   box-shadow: 2px 4px 5px rgba(0, 0, 0, 0.3);
   padding: 10px 15px;
+  color: #fff; /* Tambahkan warna teks agar terlihat */
 }
-.guide .icon {
+
+.button .icon {
   color: #007bff;
-  width: 50px;
-  height: 50px;
-  margin: 10px;
+  width: 20px;
+  height: 20px;
+  margin: 0; /* Hapus margin agar ikon berada tepat di tengah */
 }
-.guide .icon.rounded {
-  display: inline-block;
-  border: 3px solid #007bff;
-  padding: 2px;
-  border-radius: 50%;
-  padding: 10px;
-  height: 42px;
-  width: 42px;
-  margin: 10px;
+
+.divider {
+  position: relative;
+  height: 5px;
+  background: red;
 }
-.guide .ginfo .rounded {
-  display: inline-block;
-  border: 3px solid #007bff;
-  padding: 2px;
-  border-radius: 50%;
-  padding: 5px;
-  height: 42px;
-  width: 42px;
-  margin: 10px;
-}
-.guide .desc {
-  font-size: 0.8rem;
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 30%; /* Mulai dari setengah */
+  width: 70%; /* Lebar setengah */
+  height: 100%;
+  background: white;
 }
 
 @media (max-width: 768px) {
@@ -684,8 +697,63 @@ pre {
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 1rem;
-  background-color: #efefef;
+  padding-top: 1rem;
+  background-color: #111;
   text-align: center;
   font-size: 0.8rem;
+  color: #ccc;
+}
+#petunjuk {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 10px 20px;
+  background: white;
+  display: none;
+  animation: fadeInSlideUp 0.5s ease-out forwards;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+#petunjuk.show {
+  display: block;
+}
+.pheader {
+  position: relative;
+}
+.pheader .close {
+  position: absolute;
+  right: 0;
+  top: 0px;
+  border: none;
+  background: transparent;
+}
+#guides {
+  width: 1024px;
+  height: auto;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  display: grid;
+  padding: 30px 0px;
+}
+.guide {
+  width: 100%;
+  display: block;
+  border-radius: 20px;
+  box-shadow: 2px 1px 5px rgba(0, 0, 0, 0.3);
+  padding: 10px 15px;
+}
+.guide .icon {
+  color: #007bff;
+  width: 50px;
+  height: 50px;
+  margin: 10px auto;
+  display: block;
+}
+.guide .desc {
+  font-size: 0.8rem;
+  text-align: justify;
 }
