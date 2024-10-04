@@ -18,7 +18,7 @@ const data = [
       id: 3,
       title: "Batu",
       title2: "Enviromental Issue",
-      slug: "/media/bromo",
+      slug: "/media/",
       image: "/assets/images/batu.jpg",
     },
   ];
