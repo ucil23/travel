@@ -20,7 +20,7 @@ const data = [
     id: 3,
     title: "Batu",
     title2: "Enviromental Issue",
-    slug: "/media/bromo",
+    slug: "/media/batu",
     image: "/assets/images/batu.jpg",
     location: "Malang, Jawa Timur",
   },
