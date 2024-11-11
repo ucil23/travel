@@ -24,6 +24,30 @@ const data = [
     image: "/assets/images/batu.jpg",
     location: "Malang, Jawa Timur",
   },
+  {
+    id: 4,
+    title: "Pacitan",
+    title2: "Geopark Gunung Sewu",
+    slug: "/media/pacitan",
+    image: "/assets/images/pacitan.jpg",
+    location: "Pacitan, Jawa Timur",
+  },
+  {
+    id: 5,
+    title: "Ijen",
+    title2: "Geopark Ijen",
+    slug: "/media/ijen",
+    image: "/assets/images/ijen.jpg",
+    location: "Bondowoso, Jawa Timur",
+  },
+  {
+    id: 6,
+    title: "Gresik",
+    title2: "Enviromental Issue",
+    slug: "/media/gresik",
+    image: "/assets/images/gresik.jpg",
+    location: "Gresik, Jawa Timur",
+  },
 ];
 
 // ambil element berdasarkan id ="cards"
