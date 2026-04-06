@@ -1,2 +1,561 @@
-index.html
-<h1>Ini halaman CMC 2</h1>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Chatbot VFT CVC</title>
+    <!-- 
+      INSTRUKSI INTEGRASI KE 3DVISTA:
+      Salin semua kode CSS di dalam tag <style> ini dan tempelkan 
+      sebelum tag penutup </head> pada file index.html hasil ekspor 3DVista Anda.
+    -->
+    <style>
+        /* Menggunakan z-index tinggi agar berada di atas canvas 3DVista */
+        #vft-chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 99999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        /* Tombol Mengapung (Floating Action Button) */
+        #chat-toggle-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #0056b3; 
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        #chat-toggle-btn:hover {
+            transform: scale(1.05);
+            background-color: #004494;
+        }
+
+        #chat-toggle-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: currentColor;
+        }
+
+        /* Jendela Chat Utama */
+        #chat-window {
+            display: none; 
+            width: 350px;
+            height: 500px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: bottom right;
+            animation: popUp 0.3s ease-out forwards;
+        }
+
+        @keyframes popUp {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Bagian Header Chat */
+        #chat-header {
+            background-color: #0056b3;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        #chat-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* Area Pesan */
+        #chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            scroll-behavior: smooth;
+        }
+
+        /* Desain Gelembung Chat */
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .bot-message {
+            background-color: #e9ecef;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .user-message {
+            background-color: #0056b3;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        /* Area Input & Tombol Tambahan */
+        #chat-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            border-top: 1px solid #ddd;
+            gap: 5px;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        #chat-input:focus {
+            border-color: #0056b3;
+        }
+
+        .action-btn {
+            background-color: transparent;
+            border: none;
+            color: #0056b3;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: #f0f8ff;
+        }
+
+        .action-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* Status Recording Aktif */
+        .recording {
+            color: #dc3545 !important;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); opacity: 1; }
+            to { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        /* --- TAMBAHAN UNTUK GEMINI API --- */
+        #typing-indicator {
+            display: none;
+            padding: 10px 14px;
+            background-color: #e9ecef;
+            border-radius: 15px;
+            align-self: flex-start;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #555;
+            border-bottom-left-radius: 2px;
+        }
+
+        .dots {
+            display: inline-block;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: #555;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dots:nth-child(1) { animation-delay: -0.32s; }
+        .dots:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        #quick-actions {
+            display: flex;
+            gap: 8px;
+            padding: 10px 15px 0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        #quick-actions::-webkit-scrollbar { display: none; }
+        
+        .quick-btn {
+            background-color: #f0f8ff;
+            border: 1px solid #0056b3;
+            color: #0056b3;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .quick-btn:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        /* Thumbnail Gambar Terkirim */
+        .vision-thumbnail {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            #chat-window {
+                width: calc(100vw - 40px);
+                height: 450px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 
+      INSTRUKSI INTEGRASI KE 3DVISTA:
+      Salin struktur HTML <div id="vft-chat-container"> ini dan tempelkan 
+      tepat sebelum tag penutup </body> pada file index.html 3DVista Anda.
+    -->
+    <div id="vft-chat-container">
+        <!-- Jendela Chat -->
+        <div id="chat-window">
+            <div id="chat-header">
+                <span>Pemandu Virtual</span>
+                <button id="chat-close-btn">&times;</button>
+            </div>
+            <div id="chat-messages">
+                <div class="message bot-message">
+                    Halo! Saya Pemandu Virtual Anda di CVC (Clungup Virtual Conservation). Anda bisa mengetik, menggunakan perintah suara, atau memindai layar (ikon kamera) untuk mencari tahu tentang lingkungan di sekitar Anda. Ada yang ingin dipelajari?
+                </div>
+                <div id="typing-indicator" class="message">
+                    Menganalisis<span class="dots"></span><span class="dots"></span><span class="dots"></span>
+                </div>
+            </div>
+            
+            <div id="quick-actions">
+                <button class="quick-btn" onclick="sendQuickMessage('✨ Jelaskan peran ekologis ekosistem mangrove Clungup dalam menjaga keseimbangan lingkungan')">✨ Fungsi Mangrove</button>
+                <button class="quick-btn" onclick="sendQuickMessage('✨ Bagaimana langkah empiris konservasi yang dilakukan di Clungup Mangrove Conservation (CVC)?')">✨ Upaya Konservasi</button>
+                <button class="quick-btn" onclick="sendQuickMessage('✨ Sebutkan flora dan fauna endemik yang hidup di ekosistem pesisir ini')">✨ Flora & Fauna</button>
+                <button class="quick-btn" onclick="sendQuickMessage('✨ Mengapa pelestarian hutan mangrove sangat penting sebagai mitigasi bencana abrasi?')">✨ Mitigasi Abrasi</button>
+            </div>
+
+            <div id="chat-input-area">
+                <!-- Tombol Kamera (Vision) -->
+                <button id="chat-camera-btn" class="action-btn" title="Pindai tampilan saat ini">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.65 0-3-1.35-3-3s1.35-3 3-3 3 1.35 3 3-1.35 3-3 3z"></path>
+                    </svg>
+                </button>
+
+                <!-- Tombol Mic (Speech-to-Text) -->
+                <button id="chat-mic-btn" class="action-btn" title="Gunakan perintah suara">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"></path>
+                    </svg>
+                </button>
+
+                <input type="text" id="chat-input" placeholder="Tanya Pemandu Virtual...">
+                
+                <button id="chat-send-btn" class="action-btn" title="Kirim">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <button id="chat-toggle-btn" aria-label="Buka Chat">
+            <svg viewBox="0 0 24 24">
+                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- 
+      INSTRUKSI INTEGRASI KE 3DVISTA:
+      Salin kode JavaScript di bawah ini dan tempelkan 
+      tepat sebelum tag penutup </body> pada file index.html 3DVista Anda.
+    -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatWindow = document.getElementById('chat-window');
+            const toggleBtn = document.getElementById('chat-toggle-btn');
+            const closeBtn = document.getElementById('chat-close-btn');
+            const inputField = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('chat-send-btn');
+            const micBtn = document.getElementById('chat-mic-btn');
+            const cameraBtn = document.getElementById('chat-camera-btn');
+            const messagesContainer = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('typing-indicator');
+
+            let isChatOpen = false;
+            const apiKey = ""; // API Key disuntikkan secara dinamis oleh environment
+            let chatHistory = [];
+
+            // Mengatur visibilitas chat
+            function toggleChat() {
+                isChatOpen = !isChatOpen;
+                if (isChatOpen) {
+                    chatWindow.style.display = 'flex';
+                    toggleBtn.style.display = 'none';
+                    inputField.focus();
+                } else {
+                    chatWindow.style.display = 'none';
+                    toggleBtn.style.display = 'flex';
+                }
+            }
+
+            toggleBtn.addEventListener('click', toggleChat);
+            closeBtn.addEventListener('click', toggleChat);
+
+            // Fungsi Format Pesan (Mendukung teks dan gambar)
+            function appendMessage(content, sender, isImage = false, base64Data = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+                
+                if (isImage && base64Data) {
+                    const img = document.createElement('img');
+                    img.src = "data:image/jpeg;base64," + base64Data;
+                    img.classList.add('vision-thumbnail');
+                    messageDiv.appendChild(img);
+                    
+                    const textSpan = document.createElement('span');
+                    textSpan.innerHTML = content;
+                    messageDiv.appendChild(textSpan);
+                } else {
+                    messageDiv.innerHTML = content.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                }
+                
+                messagesContainer.insertBefore(messageDiv, typingIndicator);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            function showTyping(show) {
+                typingIndicator.style.display = show ? 'block' : 'none';
+                if (show) messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // Fungsi Utama: Panggil Gemini API (Multimodal Text + Image)
+            async function getGeminiResponse(userText, base64Image = null) {
+                showTyping(true);
+                
+                let userParts = [];
+                if (userText) userParts.push({ text: userText });
+                
+                if (base64Image) {
+                    userParts.push({
+                        inlineData: {
+                            mimeType: "image/jpeg",
+                            data: base64Image
+                        }
+                    });
+                    // Jika hanya gambar yang dikirim, beri instruksi otomatis
+                    if (!userText) {
+                        userParts.push({ text: "Analisis gambar lingkungan ini secara empiris berdasarkan geografi dan ekologi. Identifikasi objek, flora, atau fauna yang terlihat, lalu jelaskan manfaat, fungsi ekologis, serta kaitannya dengan mitigasi atau konservasi." });
+                    }
+                }
+
+                // Tambahkan ke memori
+                chatHistory.push({ role: "user", parts: userParts });
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                // Persona Akademis & Empiris
+                const systemInstruction = {
+                    parts: [{ 
+                        text: "Anda adalah 'Pemandu Virtual' edukatif untuk CVC (Clungup Virtual Conservation). Target: siswa SMA Kelas XI Fase F (Geografi/Lingkungan Hidup). Gunakan pendekatan empiris, logis, dan teoritis berdasarkan literatur sains/geografi terkini. Jelaskan konsep ekosistem, konservasi, mitigasi abrasi, dan identifikasi flora/fauna secara mendalam namun mudah dipahami. Jawaban maksimal 3 paragraf pendek. Gunakan bahasa Indonesia baku dan inspiratif." 
+                    }]
+                };
+
+                const payload = {
+                    contents: chatHistory,
+                    systemInstruction: systemInstruction
+                };
+
+                // Mekanisme Retry
+                let retries = 0;
+                const maxRetries = 5;
+                const baseDelay = 1000;
+
+                while (retries <= maxRetries) {
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                        const data = await response.json();
+                        const botReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Maaf, saya tidak menemukan informasi dari data tersebut.";
+                        
+                        // Simpan memori AI
+                        chatHistory.push({ role: "model", parts: [{ text: botReply }] });
+                        if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20); // Batasi memori
+
+                        showTyping(false);
+                        return botReply;
+
+                    } catch (error) {
+                        retries++;
+                        if (retries > maxRetries) {
+                            showTyping(false);
+                            console.error("Gemini API Error:", error);
+                            return "Koneksi ke sistem kecerdasan buatan terganggu. Mohon coba beberapa saat lagi.";
+                        }
+                        await new Promise(resolve => setTimeout(resolve, baseDelay * Math.pow(2, retries - 1)));
+                    }
+                }
+            }
+
+            // Fungsi Kirim Pesan Teks
+            async function handleSend(textOverride = null, base64Image = null) {
+                const text = textOverride !== null ? textOverride : inputField.value.trim();
+                
+                if (text === '' && !base64Image) return;
+
+                // Tampilkan di UI
+                if (base64Image) {
+                    appendMessage(text ? text : "[Memindai area saat ini...]", 'user', true, base64Image);
+                } else {
+                    appendMessage(text, 'user');
+                }
+                
+                inputField.value = '';
+                
+                // Sembunyikan quick actions
+                const quickActions = document.getElementById('quick-actions');
+                if (quickActions) quickActions.style.display = 'none';
+
+                // Minta balasan AI
+                const botReply = await getGeminiResponse(text, base64Image);
+                appendMessage(botReply, 'bot');
+            }
+
+            /* --- FITUR 1: SPEECH TO TEXT --- */
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.lang = 'id-ID';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = function() {
+                    micBtn.classList.add('recording');
+                    inputField.placeholder = "Mendengarkan suara Anda...";
+                };
+
+                recognition.onresult = function(event) {
+                    const speechResult = event.results[0][0].transcript;
+                    inputField.value = speechResult;
+                    handleSend(); // Otomatis kirim setelah bicara
+                };
+
+                recognition.onerror = function(event) {
+                    console.error("Speech recognition error", event.error);
+                    micBtn.classList.remove('recording');
+                    inputField.placeholder = "Tanya Pemandu Virtual...";
+                };
+
+                recognition.onend = function() {
+                    micBtn.classList.remove('recording');
+                    inputField.placeholder = "Tanya Pemandu Virtual...";
+                };
+
+                micBtn.addEventListener('click', () => {
+                    recognition.start();
+                });
+            } else {
+                // Sembunyikan tombol mic jika browser tidak mendukung
+                micBtn.style.display = 'none'; 
+            }
+
+            /* --- FITUR 2: IMAGE RECOGNITION (CANVAS CAPTURE) --- */
+            cameraBtn.addEventListener('click', () => {
+                try {
+                    // Mencari elemen canvas WebGL yang digunakan 3DVista
+                    const canvas = document.querySelector('canvas');
+                    
+                    if (!canvas) {
+                        appendMessage("Maaf, sistem tidak dapat mendeteksi tampilan panorama di layar Anda.", 'bot');
+                        return;
+                    }
+
+                    // Ambil gambar dari canvas 3DVista (format JPEG agar lebih ringan)
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    // Buang header 'data:image/jpeg;base64,' agar tersisa datanya saja
+                    const base64Data = dataUrl.split(',')[1];
+                    
+                    // Kirim ke Gemini
+                    handleSend("", base64Data);
+
+                } catch (e) {
+                    console.error("Error capturing canvas:", e);
+                    appendMessage("Maaf, pengambilan gambar ditolak oleh sistem keamanan peramban (browser) atau canvas sedang tidak aktif.", 'bot');
+                }
+            });
+
+            // Quick actions & Enter key bindings
+            window.sendQuickMessage = function(text) {
+                const cleanText = text.replace('✨ ', ''); 
+                handleSend(cleanText);
+            };
+
+            sendBtn.addEventListener('click', () => handleSend());
+            inputField.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleSend();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
