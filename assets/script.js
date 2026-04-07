@@ -50,11 +50,11 @@ const data = [
   },
   {
     id: 7,
-    title: "Lokasi Unknown",
+    title: "GeoVentura",
     title2: "Enviromental Issue",
     slug: "/media/nnn",
     image: "/assets/images/nnn.jpg",
-    location: "NNN, Jawa Timur",
+    location: "Malang, Gresik, Bondowoso, Jawa Timur",
   },
 ];
 
