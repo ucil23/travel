@@ -48,6 +48,14 @@ const data = [
     image: "/assets/images/gresik.jpg",
     location: "Gresik, Jawa Timur",
   },
+  {
+    id: 7,
+    title: "Lokasi Unknown",
+    title2: "Enviromental Issue",
+    slug: "/media/nnn",
+    image: "/assets/images/nnn.jpg",
+    location: "NNN, Jawa Timur",
+  },
 ];
 
 // ambil element berdasarkan id ="cards"
