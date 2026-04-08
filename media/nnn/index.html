@@ -1,0 +1,1874 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Project Tesis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=0.5, width=device-width, viewport-fit=cover" />
+    <link rel="preload" href="script.js?v=1773213194961" as="script"/>
+<link rel="preload" href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/l/2/0_0.jpg?v=1773213194961" as="image"/>
+<link rel="preload" href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/r/2/0_0.jpg?v=1773213194961" as="image"/>
+<link rel="preload" href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/u/2/0_0.jpg?v=1773213194961" as="image"/>
+<link rel="preload" href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/d/2/0_0.jpg?v=1773213194961" as="image"/>
+<link rel="preload" href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/f/2/0_0.jpg?v=1773213194961" as="image"/>
+<link rel="preload" href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/b/2/0_0.jpg?v=1773213194961" as="image"/>
+<script>(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create", "UA-116087-3", "auto"); ga("send", "pageview");</script>
+<meta name="description" content="Virtual Tour"/>
+<meta name="theme-color" content="#FFFFFF"/>
+    <script src="lib/tdvplayer.js?v=1773213194961"></script>
+    <script type="text/javascript">
+        var player;
+        var playersPlayingTmp = [];
+        var isInitialized = false;
+        var isPaused = false;
+
+        function loadTour()
+        {
+            if(player)
+                return;
+
+            var beginFunc = function(event){
+                if(event.name == 'begin')
+                {
+                    var camera = event.data.source.get('camera');
+                    if(camera && camera.get('initialSequence') && camera.get('initialSequence').get('movements').length > 0)
+                        return;
+                }
+
+                if(event.sourceClassName == "MediaAudio")
+                    return;
+
+                isInitialized = true;
+
+                player.unbind('preloadMediaShow', beginFunc, player, true);
+                player.unbindOnObjectsOf('PanoramaPlayListItem', 'begin', beginFunc, player, true);
+                player.unbind('stateChange', beginFunc, player, true);
+                window.parent.postMessage("tourLoaded", '*');
+
+                disposePreloader();
+
+                onVirtualTourLoaded();
+            };
+
+            var settings = new TDV.PlayerSettings();
+            
+            settings.set(TDV.PlayerSettings.CONTAINER, document.getElementById('viewer'));
+            settings.set(TDV.PlayerSettings.SCRIPT_URL, 'script.js?v=1773213194961');
+            settings.set(TDV.PlayerSettings.WEBVR_POLYFILL_URL, 'lib/WebVRPolyfill.js?v=1773213194961');
+            settings.set(TDV.PlayerSettings.HLS_URL, 'lib/Hls.js?v=1773213194961');
+            settings.set(TDV.PlayerSettings.QUERY_STRING_PARAMETERS, 'v=1773213194961');
+            window.tdvplayer = player = TDV.PlayerAPI.create(settings);
+            player.bind('preloadMediaShow', beginFunc, player, true);
+            player.bind('stateChange', beginFunc, player, true);
+            player.bindOnObjectsOf('PanoramaPlayListItem', 'begin', beginFunc, player, true);
+            player.bindOnObject('rootPlayer', 'start', function(e){
+                var queryDict = {}; location.search.substr(1).split("&").forEach(function(item) {var k = item.split("=")[0], v = decodeURIComponent(item.split("=")[1]);queryDict[k] = v});
+                var item = undefined;
+                if("media-index" in queryDict){
+                    item = setMediaByIndex(parseInt(queryDict["media-index"]) - 1);
+                }
+                else if("media-name" in queryDict){
+                    item = setMediaByName(queryDict["media-name"]);
+                }
+                else{
+                    item = setMediaByIndex(0);
+                }
+                if(item != undefined && "trigger-overlay-name" in queryDict){
+                    triggerOverlayByName(item, queryDict["trigger-overlay-name"], "trigger-overlay-event" in queryDict ? queryDict["trigger-overlay-event"] : "click");
+                }
+
+                player.getById('rootPlayer').bind('tourEnded', function(){
+                    onVirtualTourEnded();
+                }, player, true);
+            }, player, false);
+
+            /* Listen messages */
+            window.addEventListener('message', function (e) {
+                //Listen to messages for make actions to player in the format function:param1,param2
+                var action = e.data;
+                if (action == 'pauseTour' || action == 'resumeTour') {
+                    this[action].apply(this);
+                }
+            });
+        }
+
+        function pauseTour()
+        {
+            isPaused = true;
+            if(!isInitialized)
+                return;
+
+            var playLists = player.getByClassName('PlayList');
+            for(var i = 0, count = playLists.length; i<count; i++)
+            {
+                var playList = playLists[i];
+                var index = playList.get('selectedIndex');
+                if(index != -1)
+                {
+                    var item = playList.get('items')[index];
+                    var itemPlayer = item.get('player');
+                    if(itemPlayer && itemPlayer.pause)
+                    {
+                        playersPlayingTmp.push(itemPlayer);
+                        itemPlayer.pause();
+                    }
+                }
+            }
+
+            player.getById('pauseGlobalAudios')();
+        }
+
+        function resumeTour()
+        {
+            isPaused = false;
+            if(!isInitialized)
+                return;
+
+            while(playersPlayingTmp.length)
+            {
+                var viewer = playersPlayingTmp.pop();
+                viewer.play();
+            }
+
+            player.getById('resumeGlobalAudios')();
+        }
+
+        function onVirtualTourLoaded()
+        {
+            if(isPaused)
+                pauseTour();
+        }
+
+        function onVirtualTourEnded()
+        {
+
+        }
+
+        function getRootPlayer()
+        {
+            return window.tdvplayer !== undefined ? window.tdvplayer.getById('rootPlayer') : undefined;
+        }
+
+        function setMediaByIndex(index)
+        {
+            var rootPlayer = getRootPlayer();
+            if(rootPlayer !== undefined) {
+                return rootPlayer.setMainMediaByIndex(index);
+            }
+        }
+
+        function setMediaByName(name)
+        {
+            var rootPlayer = getRootPlayer();
+            if(rootPlayer !== undefined) {
+                return rootPlayer.setMainMediaByName(name);
+            }
+        }
+
+        function triggerOverlayByName(item, name, eventName)
+        {
+            var rootPlayer = getRootPlayer();
+            if(rootPlayer !== undefined) {
+                item.bind('begin', function(e){
+                    item.unbind('begin', arguments.callee, this);
+                    var overlay = rootPlayer.getPanoramaOverlayByName(item.get('media'), name);
+                    if(overlay)
+                        rootPlayer.triggerOverlay(overlay, eventName);
+                }, rootPlayer);
+            }
+        }
+
+        function showPreloader()
+        {
+            var preloadContainer = document.getElementById('preloadContainer');
+            if(preloadContainer != undefined)
+                preloadContainer.style.opacity = 1;
+        }
+
+        function disposePreloader()
+        {
+            var preloadContainer = document.getElementById('preloadContainer');
+            if(preloadContainer == undefined)
+                return;
+
+            var transitionEndName = transitionEndEventName();
+            if(transitionEndName)
+            {
+                preloadContainer.addEventListener(transitionEndName, hide, false);
+                preloadContainer.style.opacity = 0;
+                setTimeout(hide, 500); //Force hide. Some cases the transitionend event isn't dispatched with an iFrame.
+            }
+            else
+            {
+                hide();
+            }
+
+            function hide()
+            {
+                
+                preloadContainer.style.visibility = 'hidden';
+                preloadContainer.style.display = 'none';
+            }
+
+            function transitionEndEventName () {
+                var el = document.createElement('div');
+                var transitions = {
+                        'transition':'transitionend',
+                        'OTransition':'otransitionend',
+                        'MozTransition':'transitionend',
+                        'WebkitTransition':'webkitTransitionEnd'
+                    };
+
+                var t;
+                for (t in transitions) {
+                    if (el.style[t] !== undefined) {
+                        return transitions[t];
+                    }
+                }
+
+                return undefined;
+            }
+        }
+
+        function onBodyClick(){
+            document.body.removeEventListener("click", onBodyClick);
+            document.body.removeEventListener("touchend", onBodyClick);
+            loadTour();
+        }
+
+        function onLoad() {
+            if (/AppleWebKit/.test(navigator.userAgent) && /Mobile\/\w+/.test(navigator.userAgent))
+            {
+                var inIFrame = false;
+                try
+                {
+                    inIFrame = (window.self !== window.top);
+                }
+                catch (e)
+                {
+                    inIFrame = true;
+                }
+                if (!inIFrame)
+                {
+                    var onResize = function(async)
+                    {
+                        [0, 250, 1000, 2000].forEach(function(delay)
+                        {
+                            setTimeout(function()
+                            {
+                                var viewer = document.querySelector('#viewer');
+                                var scale = window.innerWidth / document.documentElement.clientWidth;
+                                var width = document.documentElement.clientWidth;
+                                var height = Math.round(window.innerHeight / scale);
+                                viewer.style.width = width + 'px';
+                                viewer.style.height = height + 'px';
+                                viewer.style.left = Math.round((window.innerWidth - width) * 0.5) + 'px';
+                                viewer.style.top = Math.round((window.innerHeight - height) * 0.5) + 'px';
+                                viewer.style.transform = 'scale(' + scale + ', ' + scale + ')';
+                                window.scrollTo(0,0);
+                            }, delay);
+                        });
+                    };
+                    window.addEventListener('resize', onResize);
+                    onResize();
+                }
+            }
+
+
+            if (isOVRWeb()){
+                showPreloader();
+                loadTour();
+                return;
+            }
+
+            showPreloader();
+loadTour()
+        }
+
+        function playVideo(video) {
+            function isSafariDesktopV11orGreater() {
+                return /^((?!chrome|android|crios|ipad|iphone).)*safari/i.test(navigator.userAgent) && parseFloat(/Version\/([0-9]+\.[0-9]+)/i.exec(navigator.userAgent)[1]) >= 11;
+            }
+
+            function detectUserAction() {
+                var onVideoClick = function(e) {
+                    if(video.paused) {
+                        video.play();
+                    }
+                    video.muted = false;
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    video.removeEventListener('click', onVideoClick);
+                    video.removeEventListener('touchend', onVideoClick);
+                };
+                video.addEventListener("click", onVideoClick);
+                video.addEventListener("touchend", onVideoClick);
+            }
+
+            if (isSafariDesktopV11orGreater()) {
+                video.muted = true;
+                video.play();
+            } else {
+                var canPlay = true;
+                var promise = video.play();
+                if (promise) {
+                    promise.catch(function() {
+                        video.muted = true;
+                        video.play();
+                        detectUserAction();
+                    });
+                } else {
+                    canPlay = false;
+                }
+
+                if (!canPlay || video.muted) {
+                    detectUserAction();
+                }
+            }
+        }
+
+        function isOVRWeb(){
+            return window.location.hash.substring(1).split('&').indexOf('ovrweb') > -1;
+        }
+    </script>
+    <style type="text/css">
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+
+        #viewer { background-color: #FFFFFF; z-index:1; position:absolute; width: 100%; height: 100%; top: 0; }
+        #preloadContainer { z-index:2; position:relative; width:100%; height:100%; transition: opacity 0.5s; -webkit-transition: opacity 0.5s; -moz-transition: opacity 0.5s; -o-transition: opacity 0.5s;}
+    </style>
+    <link rel="stylesheet" href="fonts.css?v=1773213194961">
+</head>
+<body onload="onLoad()">
+    <div id="preloadContainer" style="background-color:rgba(255,255,255,1)"><div style="z-index: 4; position: absolute; left: 0%; bottom: 40%; width: 100.00%; height: 10.00%"><div style="text-align:left; color:#000; "><DIV STYLE="text-align:center;"><SPAN STYLE="letter-spacing:0vmin;color:#777777;font-family:Arial, Helvetica, sans-serif;"><SPAN STYLE="color:#333333;font-size:1.64vmin;"><B>GeoVentura masih memuat. Tunggu sebentar ya.... :)</B></SPAN></SPAN></DIV><p STYLE="margin:0; line-height:1.64vmin;"><BR STYLE="letter-spacing:0vmin;color:#000000;font-size:0.75vmin;font-family:Arial, Helvetica, sans-serif;"/></p></div></div></div>
+    <div id="viewer"></div>
+</body>
+</html> -->
+<!doctype html>
+<html>
+  <head>
+    <title>Project Tesis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=0.5, width=device-width, viewport-fit=cover"
+    />
+    <link rel="preload" href="script.js?v=1773213194961" as="script" />
+    <link
+      rel="preload"
+      href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/l/2/0_0.jpg?v=1773213194961"
+      as="image"
+    />
+    <link
+      rel="preload"
+      href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/r/2/0_0.jpg?v=1773213194961"
+      as="image"
+    />
+    <link
+      rel="preload"
+      href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/u/2/0_0.jpg?v=1773213194961"
+      as="image"
+    />
+    <link
+      rel="preload"
+      href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/d/2/0_0.jpg?v=1773213194961"
+      as="image"
+    />
+    <link
+      rel="preload"
+      href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/f/2/0_0.jpg?v=1773213194961"
+      as="image"
+    />
+    <link
+      rel="preload"
+      href="media/panorama_57449BF2_5AE7_98BE_41CD_DF4ACCFBD2C1_0/b/2/0_0.jpg?v=1773213194961"
+      as="image"
+    />
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        ((i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          }),
+          (i[r].l = 1 * new Date()));
+        ((a = s.createElement(o)), (m = s.getElementsByTagName(o)[0]));
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(
+        window,
+        document,
+        "script",
+        "//www.google-analytics.com/analytics.js",
+        "ga",
+      );
+      ga("create", "UA-116087-3", "auto");
+      ga("send", "pageview");
+    </script>
+    <meta name="description" content="Virtual Tour" />
+    <meta name="theme-color" content="#FFFFFF" />
+    <script src="lib/tdvplayer.js?v=1773213194961"></script>
+    <script type="text/javascript">
+      var player;
+      var playersPlayingTmp = [];
+      var isInitialized = false;
+      var isPaused = false;
+
+      function loadTour() {
+        if (player) return;
+
+        // Pengecekan keamanan: Jika TDV (3DVista) tidak termuat (seperti di Canvas ini), jangan hentikan aplikasi
+        if (typeof TDV === "undefined") {
+          console.warn(
+            "TDV is not defined. File ./lib/tdvplayer.js gagal dimuat.",
+          );
+          disposePreloader();
+          var viewerContainer = document.getElementById("viewer");
+          if (viewerContainer) {
+            viewerContainer.innerHTML =
+              '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background-color:#f1f5f9;color:#334155;text-align:center;padding:20px;font-family:Arial, sans-serif;"><h2>GeoVentura (Mode Preview)</h2><p>Library 3DVista tidak ditemukan pada direktori saat ini.<br>Namun, fitur <b>Chat AI</b> di pojok kanan bawah tetap dapat Anda coba.</p></div>';
+          }
+          return;
+        }
+
+        var beginFunc = function (event) {
+          if (event.name == "begin") {
+            var camera = event.data.source.get("camera");
+            if (
+              camera &&
+              camera.get("initialSequence") &&
+              camera.get("initialSequence").get("movements").length > 0
+            )
+              return;
+          }
+
+          if (event.sourceClassName == "MediaAudio") return;
+
+          isInitialized = true;
+
+          player.unbind("preloadMediaShow", beginFunc, player, true);
+          player.unbindOnObjectsOf(
+            "PanoramaPlayListItem",
+            "begin",
+            beginFunc,
+            player,
+            true,
+          );
+          player.unbind("stateChange", beginFunc, player, true);
+          window.parent.postMessage("tourLoaded", "*");
+
+          disposePreloader();
+
+          onVirtualTourLoaded();
+        };
+
+        var settings = new TDV.PlayerSettings();
+
+        settings.set(
+          TDV.PlayerSettings.CONTAINER,
+          document.getElementById("viewer"),
+        );
+        settings.set(
+          TDV.PlayerSettings.SCRIPT_URL,
+          "script.js?v=1773213194961",
+        );
+        settings.set(
+          TDV.PlayerSettings.WEBVR_POLYFILL_URL,
+          "lib/WebVRPolyfill.js?v=1773213194961",
+        );
+        settings.set(TDV.PlayerSettings.HLS_URL, "lib/Hls.js?v=1773213194961");
+        settings.set(
+          TDV.PlayerSettings.QUERY_STRING_PARAMETERS,
+          "v=1773213194961",
+        );
+        window.tdvplayer = player = TDV.PlayerAPI.create(settings);
+        player.bind("preloadMediaShow", beginFunc, player, true);
+        player.bind("stateChange", beginFunc, player, true);
+        player.bindOnObjectsOf(
+          "PanoramaPlayListItem",
+          "begin",
+          beginFunc,
+          player,
+          true,
+        );
+        player.bindOnObject(
+          "rootPlayer",
+          "start",
+          function (e) {
+            var queryDict = {};
+            location.search
+              .substr(1)
+              .split("&")
+              .forEach(function (item) {
+                var k = item.split("=")[0],
+                  v = decodeURIComponent(item.split("=")[1]);
+                queryDict[k] = v;
+              });
+            var item = undefined;
+            if ("media-index" in queryDict) {
+              item = setMediaByIndex(parseInt(queryDict["media-index"]) - 1);
+            } else if ("media-name" in queryDict) {
+              item = setMediaByName(queryDict["media-name"]);
+            } else {
+              item = setMediaByIndex(0);
+            }
+            if (item != undefined && "trigger-overlay-name" in queryDict) {
+              triggerOverlayByName(
+                item,
+                queryDict["trigger-overlay-name"],
+                "trigger-overlay-event" in queryDict
+                  ? queryDict["trigger-overlay-event"]
+                  : "click",
+              );
+            }
+
+            player.getById("rootPlayer").bind(
+              "tourEnded",
+              function () {
+                onVirtualTourEnded();
+              },
+              player,
+              true,
+            );
+          },
+          player,
+          false,
+        );
+
+        /* Listen messages */
+        window.addEventListener("message", function (e) {
+          //Listen to messages for make actions to player in the format function:param1,param2
+          var action = e.data;
+          if (action == "pauseTour" || action == "resumeTour") {
+            this[action].apply(this);
+          }
+        });
+      }
+
+      function pauseTour() {
+        isPaused = true;
+        if (!isInitialized) return;
+
+        var playLists = player.getByClassName("PlayList");
+        for (var i = 0, count = playLists.length; i < count; i++) {
+          var playList = playLists[i];
+          var index = playList.get("selectedIndex");
+          if (index != -1) {
+            var item = playList.get("items")[index];
+            var itemPlayer = item.get("player");
+            if (itemPlayer && itemPlayer.pause) {
+              playersPlayingTmp.push(itemPlayer);
+              itemPlayer.pause();
+            }
+          }
+        }
+
+        player.getById("pauseGlobalAudios")();
+      }
+
+      function resumeTour() {
+        isPaused = false;
+        if (!isInitialized) return;
+
+        while (playersPlayingTmp.length) {
+          var viewer = playersPlayingTmp.pop();
+          viewer.play();
+        }
+
+        player.getById("resumeGlobalAudios")();
+      }
+
+      function onVirtualTourLoaded() {
+        if (isPaused) pauseTour();
+      }
+
+      function onVirtualTourEnded() {}
+
+      function getRootPlayer() {
+        return window.tdvplayer !== undefined
+          ? window.tdvplayer.getById("rootPlayer")
+          : undefined;
+      }
+
+      function setMediaByIndex(index) {
+        var rootPlayer = getRootPlayer();
+        if (rootPlayer !== undefined) {
+          return rootPlayer.setMainMediaByIndex(index);
+        }
+      }
+
+      function setMediaByName(name) {
+        var rootPlayer = getRootPlayer();
+        if (rootPlayer !== undefined) {
+          return rootPlayer.setMainMediaByName(name);
+        }
+      }
+
+      function triggerOverlayByName(item, name, eventName) {
+        var rootPlayer = getRootPlayer();
+        if (rootPlayer !== undefined) {
+          item.bind(
+            "begin",
+            function (e) {
+              item.unbind("begin", arguments.callee, this);
+              var overlay = rootPlayer.getPanoramaOverlayByName(
+                item.get("media"),
+                name,
+              );
+              if (overlay) rootPlayer.triggerOverlay(overlay, eventName);
+            },
+            rootPlayer,
+          );
+        }
+      }
+
+      function showPreloader() {
+        var preloadContainer = document.getElementById("preloadContainer");
+        if (preloadContainer != undefined) preloadContainer.style.opacity = 1;
+      }
+
+      function disposePreloader() {
+        var preloadContainer = document.getElementById("preloadContainer");
+        if (preloadContainer == undefined) return;
+
+        var transitionEndName = transitionEndEventName();
+        if (transitionEndName) {
+          preloadContainer.addEventListener(transitionEndName, hide, false);
+          preloadContainer.style.opacity = 0;
+          setTimeout(hide, 500); //Force hide. Some cases the transitionend event isn't dispatched with an iFrame.
+        } else {
+          hide();
+        }
+
+        function hide() {
+          preloadContainer.style.visibility = "hidden";
+          preloadContainer.style.display = "none";
+        }
+
+        function transitionEndEventName() {
+          var el = document.createElement("div");
+          var transitions = {
+            transition: "transitionend",
+            OTransition: "otransitionend",
+            MozTransition: "transitionend",
+            WebkitTransition: "webkitTransitionEnd",
+          };
+
+          var t;
+          for (t in transitions) {
+            if (el.style[t] !== undefined) {
+              return transitions[t];
+            }
+          }
+
+          return undefined;
+        }
+      }
+
+      function onBodyClick() {
+        document.body.removeEventListener("click", onBodyClick);
+        document.body.removeEventListener("touchend", onBodyClick);
+        loadTour();
+      }
+
+      function onLoad() {
+        if (
+          /AppleWebKit/.test(navigator.userAgent) &&
+          /Mobile\/\w+/.test(navigator.userAgent)
+        ) {
+          var inIFrame = false;
+          try {
+            inIFrame = window.self !== window.top;
+          } catch (e) {
+            inIFrame = true;
+          }
+          if (!inIFrame) {
+            var onResize = function (async) {
+              [0, 250, 1000, 2000].forEach(function (delay) {
+                setTimeout(function () {
+                  var viewer = document.querySelector("#viewer");
+                  var scale =
+                    window.innerWidth / document.documentElement.clientWidth;
+                  var width = document.documentElement.clientWidth;
+                  var height = Math.round(window.innerHeight / scale);
+                  viewer.style.width = width + "px";
+                  viewer.style.height = height + "px";
+                  viewer.style.left =
+                    Math.round((window.innerWidth - width) * 0.5) + "px";
+                  viewer.style.top =
+                    Math.round((window.innerHeight - height) * 0.5) + "px";
+                  viewer.style.transform =
+                    "scale(" + scale + ", " + scale + ")";
+                  window.scrollTo(0, 0);
+                }, delay);
+              });
+            };
+            window.addEventListener("resize", onResize);
+            onResize();
+          }
+        }
+
+        if (isOVRWeb()) {
+          showPreloader();
+          loadTour();
+          return;
+        }
+
+        showPreloader();
+        loadTour();
+      }
+
+      function playVideo(video) {
+        function isSafariDesktopV11orGreater() {
+          return (
+            /^((?!chrome|android|crios|ipad|iphone).)*safari/i.test(
+              navigator.userAgent,
+            ) &&
+            parseFloat(
+              /Version\/([0-9]+\.[0-9]+)/i.exec(navigator.userAgent)[1],
+            ) >= 11
+          );
+        }
+
+        function detectUserAction() {
+          var onVideoClick = function (e) {
+            if (video.paused) {
+              video.play();
+            }
+            video.muted = false;
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            video.removeEventListener("click", onVideoClick);
+            video.removeEventListener("touchend", onVideoClick);
+          };
+          video.addEventListener("click", onVideoClick);
+          video.addEventListener("touchend", onVideoClick);
+        }
+
+        if (isSafariDesktopV11orGreater()) {
+          video.muted = true;
+          video.play();
+        } else {
+          var canPlay = true;
+          var promise = video.play();
+          if (promise) {
+            promise.catch(function () {
+              video.muted = true;
+              video.play();
+              detectUserAction();
+            });
+          } else {
+            canPlay = false;
+          }
+
+          if (!canPlay || video.muted) {
+            detectUserAction();
+          }
+        }
+      }
+
+      function isOVRWeb() {
+        return (
+          window.location.hash.substring(1).split("&").indexOf("ovrweb") > -1
+        );
+      }
+    </script>
+    <style type="text/css">
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right)
+          env(safe-area-inset-bottom) env(safe-area-inset-left);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      #viewer {
+        background-color: #ffffff;
+        z-index: 1;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+      }
+      #preloadContainer {
+        z-index: 2;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.5s;
+        -webkit-transition: opacity 0.5s;
+        -moz-transition: opacity 0.5s;
+        -o-transition: opacity 0.5s;
+      }
+
+      /* =========================================
+           KODE CSS WIDGET CHAT AI
+           ========================================= */
+      #geoventura-ai-widget {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 99999;
+      }
+
+      .chat-fab {
+        width: 60px;
+        height: 60px;
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .chat-fab:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+      }
+      .chat-fab svg {
+        width: 28px;
+        height: 28px;
+        fill: currentColor;
+      }
+
+      .chat-panel {
+        position: absolute;
+        bottom: 80px;
+        right: 0;
+        width: 380px;
+        height: 550px;
+        max-height: calc(100vh - 120px);
+        background-color: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(20px) scale(0.95);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+        transform-origin: bottom right;
+      }
+      .chat-panel.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+      }
+
+      .chat-header {
+        background-color: #2563eb;
+        color: white;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .chat-header-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .chat-avatar {
+        width: 36px;
+        height: 36px;
+        background-color: white;
+        color: #2563eb;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .chat-title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+      }
+      .chat-subtitle {
+        margin: 0;
+        font-size: 12px;
+        opacity: 0.8;
+        margin-top: 2px;
+        color: white;
+      }
+      .chat-close {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: background 0.2s;
+      }
+      .chat-close:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .chat-body {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .message {
+        max-width: 85%;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+        animation: fadeIn 0.3s ease;
+      }
+      .message strong {
+        color: #1e293b;
+      }
+      .message img {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-top: 8px;
+      }
+
+      .message audio {
+        margin-top: 8px;
+        width: 100%;
+        height: 30px;
+      }
+
+      .message .play-audio-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 4px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-top: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .message .play-audio-btn svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .msg-ai {
+        background-color: #ffffff;
+        color: #334155;
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+      }
+      .msg-user {
+        background-color: #2563eb;
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+      }
+
+      .quick-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 10px;
+      }
+      .action-chip {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        border-radius: 16px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .action-chip:hover {
+        background-color: #dbeafe;
+        transform: translateY(-1px);
+      }
+
+      .typing-indicator {
+        display: flex;
+        gap: 4px;
+        padding: 12px 16px;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        border-bottom-left-radius: 4px;
+        align-self: flex-start;
+        width: fit-content;
+      }
+      .typing-dot {
+        width: 6px;
+        height: 6px;
+        background-color: #94a3b8;
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out both;
+      }
+      .typing-dot:nth-child(1) {
+        animation-delay: -0.32s;
+      }
+      .typing-dot:nth-child(2) {
+        animation-delay: -0.16s;
+      }
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: scale(0);
+        }
+        40% {
+          transform: scale(1);
+        }
+      }
+
+      .chat-footer {
+        padding: 16px;
+        background-color: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .image-preview-area {
+        display: none;
+        position: relative;
+        padding: 8px;
+        background: #f1f5f9;
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+
+      .image-preview-area img {
+        max-height: 80px;
+        max-width: 100%;
+        border-radius: 4px;
+        border: 1px solid #cbd5e1;
+      }
+
+      .image-preview-area .remove-img-btn {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .upload-btn {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+        flex-shrink: 0;
+      }
+
+      .upload-btn:hover {
+        background-color: #e2e8f0;
+      }
+
+      .upload-btn svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .mic-btn {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: 1px solid #cbd5e1;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+
+      .mic-btn:hover {
+        background-color: #e2e8f0;
+      }
+
+      .mic-btn.recording {
+        background-color: #ef4444;
+        color: white;
+        border-color: #ef4444;
+        animation: pulse 1.5s infinite;
+      }
+
+      .mic-btn svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 24px;
+        outline: none;
+        font-size: 14px;
+        transition: border-color 0.2s;
+        font-family: inherit;
+      }
+      .chat-input:focus {
+        border-color: #2563eb;
+      }
+      .chat-send {
+        width: 44px;
+        height: 44px;
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+        flex-shrink: 0;
+      }
+      .chat-send:hover {
+        background-color: #1d4ed8;
+      }
+      .chat-send:disabled {
+        background-color: #94a3b8;
+        cursor: not-allowed;
+      }
+      .chat-send svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        margin-left: -2px;
+      }
+
+      @media (max-width: 480px) {
+        .chat-panel {
+          position: fixed;
+          bottom: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          max-height: 100vh;
+          border-radius: 0;
+        }
+        #geoventura-ai-widget {
+          bottom: 16px;
+          right: 16px;
+        }
+      }
+    </style>
+    <link rel="stylesheet" href="fonts.css?v=1773213194961" />
+  </head>
+  <body onload="onLoad()">
+    <div id="preloadContainer" style="background-color: rgba(255, 255, 255, 1)">
+      <div
+        style="
+          z-index: 4;
+          position: absolute;
+          left: 0%;
+          bottom: 40%;
+          width: 100%;
+          height: 10%;
+        "
+      >
+        <div style="text-align: left; color: #000">
+          <div style="text-align: center">
+            <span
+              STYLE="letter-spacing:0vmin;color:#777777;font-family:Arial, Helvetica, sans-serif;"
+              ><span STYLE="color:#333333;font-size:1.64vmin;"
+                ><b>GeoVentura masih memuat. Tunggu sebentar ya.... :)</b></span
+              ></span
+            >
+          </div>
+          <p style="margin: 0; line-height: 1.64vmin">
+            <br
+              style="
+                letter-spacing: 0vmin;
+                color: #000000;
+                font-size: 0.75vmin;
+                font-family: Arial, Helvetica, sans-serif;
+              "
+            />
+          </p>
+        </div>
+      </div>
+    </div>
+    <div id="viewer"></div>
+
+    <!-- =========================================
+         WIDGET CHAT AI GEOVENTURA
+         ========================================= -->
+    <div id="geoventura-ai-widget">
+      <div class="chat-panel" id="gt-chat-panel">
+        <div class="chat-header">
+          <div class="chat-header-info">
+            <div class="chat-avatar">GV</div>
+            <div>
+              <h3 class="chat-title">GeoVentura AI</h3>
+              <p class="chat-subtitle">Asisten Virtual Tesis</p>
+            </div>
+          </div>
+          <button class="chat-close" id="gt-close-chat" aria-label="Tutup Chat">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="chat-body" id="gt-chat-body">
+          <div class="message msg-ai">
+            Halo! Selamat datang di GeoVentura. Saya siap memandu dan menjawab
+            pertanyaan Anda terkait lingkungan virtual ini. Anda juga bisa
+            mengunggah gambar untuk saya lihat!
+          </div>
+
+          <!-- Aksi Cepat AI (Quick Actions) -->
+          <div class="quick-actions" id="gt-quick-actions">
+            <button
+              class="action-chip"
+              onclick="
+                sendQuickAction(
+                  'Beri tahu saya fakta menarik tentang lokasi ini.',
+                )
+              "
+            >
+              ✨ Fakta Menarik
+            </button>
+            <button
+              class="action-chip"
+              onclick="
+                sendQuickAction(
+                  'Apa saja yang bisa saya lakukan di penjelajahan virtual ini?',
+                )
+              "
+            >
+              ✨ Panduan Penggunaan
+            </button>
+            <button
+              class="action-chip"
+              onclick="
+                sendQuickAction('Jelaskan formasi geologi yang ada di sini.')
+              "
+            >
+              ✨ Info Geologi
+            </button>
+          </div>
+        </div>
+
+        <div class="chat-footer">
+          <div class="image-preview-area" id="img-preview-area">
+            <img id="img-preview" src="" alt="Preview" />
+            <button class="remove-img-btn" id="remove-img-btn">&times;</button>
+          </div>
+          <div class="input-row">
+            <!-- File Input Tersembunyi -->
+            <input
+              type="file"
+              id="file-upload"
+              accept="image/*"
+              style="display: none"
+            />
+
+            <!-- Tombol Upload Gambar -->
+            <button
+              class="upload-btn"
+              id="upload-btn"
+              aria-label="Upload Gambar"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </button>
+
+            <!-- Tombol Input Suara (Speech-to-Text) -->
+            <button class="mic-btn" id="mic-btn" aria-label="Input Suara">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"
+                ></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="22"></line>
+              </svg>
+            </button>
+
+            <input
+              type="text"
+              class="chat-input"
+              id="gt-chat-input"
+              placeholder="Tanya atau unggah gambar..."
+              autocomplete="off"
+            />
+            <button class="chat-send" id="gt-send-btn" aria-label="Kirim Pesan">
+              <svg viewBox="0 0 24 24">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="chat-fab" id="gt-chat-fab" aria-label="Buka Chat AI">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- LOGIKA JAVASCRIPT WIDGET AI -->
+    <script>
+      // =========================================================================
+      // KUNCI API GEMINI
+      // Kosongkan ini jika Anda mengetes di dalam Canvas/Preview platform kami.
+      // Isi dengan API Key Anda (contoh: "AIzaSy...") JIKA Anda mengetesnya di
+      // komputer Anda (Live Server) atau Hosting Anda sendiri.
+      // =========================================================================
+      const apiKey = "AIzaSyCuqbPNA0hyrpAzZihsq1UsaY35atqUWCQ";
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const chatFab = document.getElementById("gt-chat-fab");
+        const chatPanel = document.getElementById("gt-chat-panel");
+        const closeBtn = document.getElementById("gt-close-chat");
+        const chatBody = document.getElementById("gt-chat-body");
+        const chatInput = document.getElementById("gt-chat-input");
+        const sendBtn = document.getElementById("gt-send-btn");
+        const quickActions = document.getElementById("gt-quick-actions");
+
+        // Elemen Upload Gambar & Mic
+        const fileUpload = document.getElementById("file-upload");
+        const uploadBtn = document.getElementById("upload-btn");
+        const micBtn = document.getElementById("mic-btn");
+        const imgPreviewArea = document.getElementById("img-preview-area");
+        const imgPreview = document.getElementById("img-preview");
+        const removeImgBtn = document.getElementById("remove-img-btn");
+
+        let currentBase64Image = null;
+        let currentMimeType = null;
+
+        // Instruksi Sistem untuk membentuk persona AI
+        const systemPrompt = `Anda adalah asisten pemandu virtual resmi bernama "GeoVentura AI" untuk proyek Tesis Virtual Field Trip. 
+            Tugas Anda adalah memandu pengunjung yang sedang melihat panorama 360 derajat. 
+            Anda dapat melihat gambar yang diunggah pengunjung dan menganalisisnya, terutama jika terkait dengan batuan, geologi, atau lingkungan.
+            Bersikaplah ramah, akademis namun mudah dipahami, dan berikan penjelasan mendalam mengenai aspek geologi, lingkungan, atau pertanyaan relevan lainnya.
+            Jawablah dalam bahasa Indonesia. Format teks Anda dengan Markdown dasar (seperti **tebal** untuk penekanan) agar mudah dibaca.
+            Jaga agar jawaban Anda informatif namun tidak terlalu panjang agar nyaman dibaca di widget chat kecil.`;
+
+        // Riwayat percakapan
+        let chatHistory = [];
+
+        function toggleChat() {
+          chatPanel.classList.toggle("active");
+          if (chatPanel.classList.contains("active")) {
+            chatInput.focus();
+          }
+        }
+
+        chatFab.addEventListener("click", toggleChat);
+        closeBtn.addEventListener("click", toggleChat);
+
+        function scrollToBottom() {
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Fungsi mengubah markdown tebal ke HTML
+        function formatTextToHTML(text) {
+          let html = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+          html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
+          html = html.replace(/\n/g, "<br>");
+          return html;
+        }
+
+        // Konversi PCM ke WAV untuk Text-to-Speech
+        function pcmToWav(pcmData, sampleRate) {
+          const numChannels = 1;
+          const byteRate = sampleRate * numChannels * 2;
+          const blockAlign = numChannels * 2;
+          const buffer = new ArrayBuffer(44 + pcmData.length);
+          const view = new DataView(buffer);
+
+          writeString(view, 0, "RIFF");
+          view.setUint32(4, 36 + pcmData.length, true);
+          writeString(view, 8, "WAVE");
+          writeString(view, 12, "fmt ");
+          view.setUint32(16, 16, true);
+          view.setUint16(20, 1, true);
+          view.setUint16(22, numChannels, true);
+          view.setUint32(24, sampleRate, true);
+          view.setUint32(28, byteRate, true);
+          view.setUint16(32, blockAlign, true);
+          view.setUint16(34, 16, true);
+          writeString(view, 36, "data");
+          view.setUint32(40, pcmData.length, true);
+
+          const pcm16Data = new Uint8Array(pcmData);
+          for (let i = 0; i < pcm16Data.length; i++) {
+            view.setUint8(44 + i, pcm16Data[i]);
+          }
+
+          return buffer;
+        }
+
+        function writeString(view, offset, string) {
+          for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+          }
+        }
+
+        function appendMessage(text, sender, imageUrl = null, audioUrl = null) {
+          const msgDiv = document.createElement("div");
+          msgDiv.className = `message ${sender === "user" ? "msg-user" : "msg-ai"}`;
+
+          let contentHTML = "";
+
+          if (imageUrl) {
+            contentHTML += `<img src="${imageUrl}" alt="Uploaded Image"><br>`;
+          }
+
+          if (sender === "ai") {
+            contentHTML += formatTextToHTML(text);
+            if (audioUrl) {
+              contentHTML += `<br><button class="play-audio-btn" onclick="const audio = new Audio('${audioUrl}'); audio.play();"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Dengarkan</button>`;
+            }
+          } else {
+            contentHTML += text; // Hindari XSS untuk input user
+          }
+
+          msgDiv.innerHTML = contentHTML;
+
+          chatBody.insertBefore(msgDiv, quickActions);
+          scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+          const typingDiv = document.createElement("div");
+          typingDiv.className = "typing-indicator";
+          typingDiv.id = "gt-typing";
+          typingDiv.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+          chatBody.insertBefore(typingDiv, quickActions);
+          scrollToBottom();
+          return typingDiv;
+        }
+
+        // --- FUNGSI UPLOAD GAMBAR ---
+        uploadBtn.addEventListener("click", () => {
+          fileUpload.click();
+        });
+
+        fileUpload.addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              imgPreview.src = event.target.result;
+              imgPreviewArea.style.display = "block";
+
+              // Ekstrak base64 data dan tipe mime
+              const base64String = event.target.result.split(",")[1];
+              currentBase64Image = base64String;
+              currentMimeType = file.type;
+            };
+            reader.readAsDataURL(file);
+          }
+        });
+
+        removeImgBtn.addEventListener("click", () => {
+          imgPreview.src = "";
+          imgPreviewArea.style.display = "none";
+          fileUpload.value = "";
+          currentBase64Image = null;
+          currentMimeType = null;
+        });
+
+        // --- FUNGSI SPEECH TO TEXT (VOICE INPUT) ---
+        let recognition;
+        let isRecording = false;
+
+        if (
+          "webkitSpeechRecognition" in window ||
+          "SpeechRecognition" in window
+        ) {
+          const SpeechRecognition =
+            window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognition = new SpeechRecognition();
+          recognition.lang = "id-ID"; // Bahasa Indonesia
+          recognition.continuous = false;
+          recognition.interimResults = false;
+
+          recognition.onstart = function () {
+            isRecording = true;
+            micBtn.classList.add("recording");
+            chatInput.placeholder = "Mendengarkan suara Anda...";
+          };
+
+          recognition.onresult = function (event) {
+            const transcript = event.results[0][0].transcript;
+            chatInput.value += (chatInput.value ? " " : "") + transcript;
+          };
+
+          recognition.onerror = function (event) {
+            console.error("Kesalahan pengenalan suara:", event.error);
+            isRecording = false;
+            micBtn.classList.remove("recording");
+            chatInput.placeholder = "Tanya atau unggah gambar...";
+          };
+
+          recognition.onend = function () {
+            isRecording = false;
+            micBtn.classList.remove("recording");
+            chatInput.placeholder = "Tanya atau unggah gambar...";
+          };
+
+          micBtn.addEventListener("click", () => {
+            if (isRecording) {
+              recognition.stop();
+            } else {
+              recognition.start();
+            }
+          });
+        } else {
+          // Sembunyikan tombol jika browser tidak mendukung
+          micBtn.style.display = "none";
+        }
+
+        // --- FUNGSI TEXT TO SPEECH API GEMINI ---
+        async function fetchTTS(text) {
+          const modelName = "gemini-2.5-flash-preview-tts";
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+          const payload = {
+            contents: [
+              {
+                parts: [
+                  {
+                    text: text,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              responseModalities: ["AUDIO"],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: {
+                    voiceName: "Kore", // Suara default
+                  },
+                },
+              },
+            },
+            model: modelName,
+          };
+
+          try {
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+              console.warn("TTS API Not OK", response.status);
+              return null; // Gagal TTS
+            }
+
+            const result = await response.json();
+
+            if (
+              result.candidates &&
+              result.candidates[0] &&
+              result.candidates[0].content &&
+              result.candidates[0].content.parts[0] &&
+              result.candidates[0].content.parts[0].inlineData
+            ) {
+              const inlineData =
+                result.candidates[0].content.parts[0].inlineData;
+              const pcmBase64 = inlineData.data;
+              const mimeType = inlineData.mimeType; // cth: audio/L16; rate=24000
+
+              // Ekstrak Sample Rate
+              let sampleRate = 24000;
+              const rateMatch = mimeType.match(/rate=(\d+)/);
+              if (rateMatch && rateMatch[1]) {
+                sampleRate = parseInt(rateMatch[1], 10);
+              }
+
+              // Decode Base64 ke ArrayBuffer
+              const binaryString = window.atob(pcmBase64);
+              const len = binaryString.length;
+              const bytes = new Uint8Array(len);
+              for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+              }
+
+              // Konversi ke WAV
+              const wavBuffer = pcmToWav(bytes.buffer, sampleRate);
+              const wavBlob = new Blob([wavBuffer], { type: "audio/wav" });
+              const audioUrl = URL.createObjectURL(wavBlob);
+
+              return audioUrl;
+            }
+            return null;
+          } catch (error) {
+            console.error("Error TTS:", error);
+            return null;
+          }
+        }
+
+        // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
+        async function fetchGeminiResponse(userText, base64Img, mimeType) {
+          // LOGIKA PINTAR:
+          const modelName = "gemini-flash-latest";
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+
+          chatHistory.push({ text: userText });
+          const recentHistoryText = chatHistory
+            .slice(-5)
+            .map((msg) => msg.text)
+            .join("\n---\n");
+
+          let partsArray = [
+            {
+              text: `Konteks Percakapan Sebelumnya:\n${recentHistoryText}\n\nPesan Pengguna Saat Ini: ${userText}`,
+            },
+          ];
+
+          // Tambahkan gambar ke payload jika ada
+          if (base64Img && mimeType) {
+            partsArray.push({
+              inlineData: {
+                mimeType: mimeType,
+                data: base64Img,
+              },
+            });
+          }
+
+          const payload = {
+            contents: [
+              {
+                parts: partsArray,
+              },
+            ],
+            systemInstruction: {
+              parts: [{ text: systemPrompt }],
+            },
+          };
+
+          const delays = [1000, 2000, 4000, 8000, 16000];
+
+          for (let i = 0; i <= delays.length; i++) {
+            try {
+              const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+
+              if (!response.ok)
+                throw new Error(`HTTP error! status: ${response.status}`);
+
+              const result = await response.json();
+              const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+              if (aiReply) {
+                return aiReply;
+              } else {
+                throw new Error("Format balasan API tidak terduga");
+              }
+            } catch (error) {
+              if (i === delays.length) {
+                return "Maaf, koneksi ke server AI saat ini sedang tidak stabil. Pastikan API key Anda valid jika diuji di luar platform ini.";
+              }
+              await new Promise((resolve) => setTimeout(resolve, delays[i]));
+            }
+          }
+        }
+
+        // Aksi cepat
+        window.sendQuickAction = async function (text) {
+          chatInput.value = text;
+          sendMessage();
+        };
+
+        async function sendMessage() {
+          const text = chatInput.value.trim();
+          if (!text && !currentBase64Image) return; // Butuh teks atau gambar
+
+          chatInput.disabled = true;
+          sendBtn.disabled = true;
+          uploadBtn.disabled = true;
+          if (micBtn) micBtn.disabled = true;
+
+          // Tampilkan pesan user (dan gambar jika ada)
+          const imgUrl = currentBase64Image
+            ? `data:${currentMimeType};base64,${currentBase64Image}`
+            : null;
+          appendMessage(text || "Mengirim gambar...", "user", imgUrl);
+
+          // Simpan state gambar untuk dikirim ke API, lalu reset UI
+          const payloadImg = currentBase64Image;
+          const payloadMime = currentMimeType;
+
+          chatInput.value = "";
+          removeImgBtn.click(); // Reset preview
+          quickActions.style.display = "none";
+
+          const typingIndicator = showTypingIndicator();
+
+          // 1. Dapatkan balasan teks dari AI
+          const replyText = await fetchGeminiResponse(
+            text,
+            payloadImg,
+            payloadMime,
+          );
+
+          // 2. Opsional: Dapatkan suara (TTS)
+          let audioUrl = null;
+          // Hanya jalankan TTS jika tidak error koneksi
+          if (!replyText.startsWith("Maaf, koneksi")) {
+            // Filter markdown dari text agar TTS terdengar lebih natural
+            const cleanText = replyText.replace(/[*#]/g, "").slice(0, 500); // Batasi panjang TTS
+            audioUrl = await fetchTTS(cleanText);
+          }
+
+          if (document.getElementById("gt-typing")) {
+            document.getElementById("gt-typing").remove();
+          }
+
+          // Tampilkan balasan AI berserta tombol Play Audio jika berhasil
+          appendMessage(replyText, "ai", null, audioUrl);
+
+          chatInput.disabled = false;
+          sendBtn.disabled = false;
+          uploadBtn.disabled = false;
+          if (micBtn) micBtn.disabled = false;
+          chatInput.focus();
+        }
+
+        sendBtn.addEventListener("click", sendMessage);
+        chatInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") sendMessage();
+        });
+      });
+    </script>
+  </body>
+</html>

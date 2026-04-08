@@ -48,6 +48,14 @@ const data = [
     image: "/assets/images/gresik.jpg",
     location: "Gresik, Jawa Timur",
   },
+  {
+    id: 7,
+    title: "GeoVentura",
+    title2: "Natural Resource",
+    slug: "/media/nnn",
+    image: "/assets/images/sampulbaru.jpg",
+    location: "Malang, Gresik, Bondowoso, Jawa Timur",
+  },
 ];
 
 // ambil element berdasarkan id ="cards"
