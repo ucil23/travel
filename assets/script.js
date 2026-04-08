@@ -51,9 +51,9 @@ const data = [
   {
     id: 7,
     title: "GeoVentura",
-    title2: "Enviromental Issue",
+    title2: "Natural Resource",
     slug: "/media/nnn",
-    image: "/assets/images/nnn.jpg",
+    image: "/assets/images/sampulbaru.jpg",
     location: "Malang, Gresik, Bondowoso, Jawa Timur",
   },
 ];
