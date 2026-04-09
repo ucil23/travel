@@ -1592,7 +1592,7 @@ loadTour()
 
         // --- Gemini API Logic ---
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+           const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
           let parts = [{ text: `Riwayat: ${JSON.stringify(chatHistory.slice(-3))}\n\nUser: ${userText}` }];
           if (base64Img) parts.push({ inline_data: { mime_type: mimeType, data: base64Img } });
 
