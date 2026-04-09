@@ -1698,12 +1698,12 @@ loadTour()
               result.candidates[0] &&
               result.candidates[0].content &&
               result.candidates[0].content.parts[0] &&
-              result.candidates[0].content.parts[0].inlineData
+              result.candidates[0].content.parts[0].inline_data
             ) {
               const inlineData =
-                result.candidates[0].content.parts[0].inlineData;
+                result.candidates[0].content.parts[0].inline_data;
               const pcmBase64 = inlineData.data;
-              const mimeType = inlineData.mimeType; // cth: audio/L16; rate=24000
+              const mimeType = inlineData.mime_type; // cth: audio/L16; rate=24000
 
               // Ekstrak Sample Rate
               let sampleRate = 24000;
