@@ -1440,7 +1440,8 @@ loadTour()
       // Isi dengan API Key Anda (contoh: "AIzaSy...") JIKA Anda mengetesnya di
       // komputer Anda (Live Server) atau Hosting Anda sendiri.
       // =========================================================================
-      const apiKey = "AIzaSyDaIQDY4Nb4orq4BE9N4tSi-zOec3BrO8U";
+     
+      const apiKey = "AIzaSyDaIQDY4Nb4orq4BE9N4tSi-zOec3BrO8U"; // Ganti jika punya key baru
 
       document.addEventListener("DOMContentLoaded", function () {
         const chatFab = document.getElementById("gt-chat-fab");
@@ -1451,7 +1452,6 @@ loadTour()
         const sendBtn = document.getElementById("gt-send-btn");
         const quickActions = document.getElementById("gt-quick-actions");
 
-        // Elemen Upload Gambar & Mic
         const fileUpload = document.getElementById("file-upload");
         const uploadBtn = document.getElementById("upload-btn");
         const micBtn = document.getElementById("mic-btn");
@@ -1461,23 +1461,17 @@ loadTour()
 
         let currentBase64Image = null;
         let currentMimeType = null;
+        let chatHistory = [];
+        let isAILoading = false;
 
-        // Instruksi Sistem untuk membentuk persona AI
         const systemPrompt = `Anda adalah asisten pemandu virtual resmi bernama "GeoVentura AI" untuk proyek Tesis Virtual Field Trip. 
             Tugas Anda adalah memandu pengunjung yang sedang melihat panorama 360 derajat. 
-            Anda dapat melihat gambar yang diunggah pengunjung dan menganalisisnya, terutama jika terkait dengan batuan, geologi, atau lingkungan.
-            Bersikaplah ramah, akademis namun mudah dipahami, dan berikan penjelasan mendalam mengenai aspek geologi, lingkungan, atau pertanyaan relevan lainnya.
-            Jawablah dalam bahasa Indonesia. Format teks Anda dengan Markdown dasar (seperti **tebal** untuk penekanan) agar mudah dibaca.
-            Jaga agar jawaban Anda informatif namun tidak terlalu panjang agar nyaman dibaca di widget chat kecil.`;
-
-        // Riwayat percakapan
-        let chatHistory = [];
+            Anda dapat menganalisis gambar yang diunggah, terutama terkait batuan, geologi, atau lingkungan.
+            Bersikaplah ramah, akademis namun mudah dipahami. Jawab dalam Bahasa Indonesia dengan format Markdown.`;
 
         function toggleChat() {
           chatPanel.classList.toggle("active");
-          if (chatPanel.classList.contains("active")) {
-            chatInput.focus();
-          }
+          if (chatPanel.classList.contains("active")) chatInput.focus();
         }
 
         chatFab.addEventListener("click", toggleChat);
@@ -1487,105 +1481,82 @@ loadTour()
           chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        // Fungsi mengubah markdown tebal ke HTML
         function formatTextToHTML(text) {
-          let html = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-          html = html.replace(/\*(.*?)\*/g, "<em>$1</em>");
-          html = html.replace(/\n/g, "<br>");
-          return html;
+          return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                     .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                     .replace(/\n/g, "<br>");
         }
 
-        // Konversi PCM ke WAV untuk Text-to-Speech
-        function pcmToWav(pcmData, sampleRate) {
-          const numChannels = 1;
-          const byteRate = sampleRate * numChannels * 2;
-          const blockAlign = numChannels * 2;
-          const buffer = new ArrayBuffer(44 + pcmData.length);
-          const view = new DataView(buffer);
-
-          writeString(view, 0, "RIFF");
-          view.setUint32(4, 36 + pcmData.length, true);
-          writeString(view, 8, "WAVE");
-          writeString(view, 12, "fmt ");
-          view.setUint32(16, 16, true);
-          view.setUint16(20, 1, true);
-          view.setUint16(22, numChannels, true);
-          view.setUint32(24, sampleRate, true);
-          view.setUint32(28, byteRate, true);
-          view.setUint16(32, blockAlign, true);
-          view.setUint16(34, 16, true);
-          writeString(view, 36, "data");
-          view.setUint32(40, pcmData.length, true);
-
-          const pcm16Data = new Uint8Array(pcmData);
-          for (let i = 0; i < pcm16Data.length; i++) {
-            view.setUint8(44 + i, pcm16Data[i]);
-          }
-
-          return buffer;
-        }
-
+        // --- TTS Helper (PCM to WAV) ---
         function writeString(view, offset, string) {
           for (let i = 0; i < string.length; i++) {
             view.setUint8(offset + i, string.charCodeAt(i));
           }
         }
 
+        function pcmToWav(pcmBuffer, sampleRate) {
+          const numChannels = 1;
+          const buffer = new ArrayBuffer(44 + pcmBuffer.byteLength);
+          const view = new DataView(buffer);
+          writeString(view, 0, 'RIFF');
+          view.setUint32(4, 36 + pcmBuffer.byteLength, true);
+          writeString(view, 8, 'WAVE');
+          writeString(view, 12, 'fmt ');
+          view.setUint32(16, 16, true);
+          view.setUint16(20, 1, true);
+          view.setUint16(22, numChannels, true);
+          view.setUint32(24, sampleRate, true);
+          view.setUint32(28, sampleRate * 2, true);
+          view.setUint16(32, numChannels * 2, true);
+          view.setUint16(34, 16, true);
+          writeString(view, 36, 'data');
+          view.setUint32(40, pcmBuffer.byteLength, true);
+          const pcmData = new Uint8Array(pcmBuffer);
+          for (let i = 0; i < pcmData.length; i++) {
+            view.setUint8(44 + i, pcmData[i]);
+          }
+          return buffer;
+        }
+
+        // --- UI Messages ---
         function appendMessage(text, sender, imageUrl = null, audioUrl = null) {
           const msgDiv = document.createElement("div");
           msgDiv.className = `message ${sender === "user" ? "msg-user" : "msg-ai"}`;
-
           let contentHTML = "";
-
-          if (imageUrl) {
-            contentHTML += `<img src="${imageUrl}" alt="Uploaded Image"><br>`;
-          }
-
+          if (imageUrl) contentHTML += `<img src="${imageUrl}" style="margin-bottom:8px;"><br>`;
           if (sender === "ai") {
             contentHTML += formatTextToHTML(text);
             if (audioUrl) {
-              contentHTML += `<br><button class="play-audio-btn" onclick="const audio = new Audio('${audioUrl}'); audio.play();"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Dengarkan</button>`;
+              contentHTML += `<br><button class="play-audio-btn" onclick="new Audio('${audioUrl}').play()"><svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;"><path d="M8 5v14l11-7z"/></svg> Dengarkan Suara</button>`;
             }
           } else {
-            contentHTML += text; // Hindari XSS untuk input user
+            contentHTML += text;
           }
-
           msgDiv.innerHTML = contentHTML;
-
           chatBody.insertBefore(msgDiv, quickActions);
           scrollToBottom();
         }
 
         function showTypingIndicator() {
-          const typingDiv = document.createElement("div");
-          typingDiv.className = "typing-indicator";
-          typingDiv.id = "gt-typing";
-          typingDiv.innerHTML = `
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                `;
-          chatBody.insertBefore(typingDiv, quickActions);
+          const div = document.createElement("div");
+          div.className = "typing-indicator";
+          div.id = "gt-typing";
+          div.innerHTML = `<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>`;
+          chatBody.insertBefore(div, quickActions);
           scrollToBottom();
-          return typingDiv;
+          return div;
         }
 
-        // --- FUNGSI UPLOAD GAMBAR ---
-        uploadBtn.addEventListener("click", () => {
-          fileUpload.click();
-        });
-
+        // --- Image Upload ---
+        uploadBtn.addEventListener("click", () => fileUpload.click());
         fileUpload.addEventListener("change", (e) => {
           const file = e.target.files[0];
           if (file) {
             const reader = new FileReader();
-            reader.onload = function (event) {
-              imgPreview.src = event.target.result;
+            reader.onload = (ex) => {
+              imgPreview.src = ex.target.result;
               imgPreviewArea.style.display = "block";
-
-              // Ekstrak base64 data dan tipe mime
-              const base64String = event.target.result.split(",")[1];
-              currentBase64Image = base64String;
+              currentBase64Image = ex.target.result.split(",")[1];
               currentMimeType = file.type;
             };
             reader.readAsDataURL(file);
@@ -1593,285 +1564,96 @@ loadTour()
         });
 
         removeImgBtn.addEventListener("click", () => {
-          imgPreview.src = "";
           imgPreviewArea.style.display = "none";
-          fileUpload.value = "";
           currentBase64Image = null;
-          currentMimeType = null;
+          fileUpload.value = "";
         });
 
-        // --- FUNGSI SPEECH TO TEXT (VOICE INPUT) ---
-        let recognition;
-        let isRecording = false;
-
-        if (
-          "webkitSpeechRecognition" in window ||
-          "SpeechRecognition" in window
-        ) {
-          const SpeechRecognition =
-            window.SpeechRecognition || window.webkitSpeechRecognition;
-          recognition = new SpeechRecognition();
-          recognition.lang = "id-ID"; // Bahasa Indonesia
-          recognition.continuous = false;
-          recognition.interimResults = false;
-
-          recognition.onstart = function () {
-            isRecording = true;
+        // --- Speech to Text ---
+        if ("webkitSpeechRecognition" in window || "SpeechRecognition" in window) {
+          const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+          const recognition = new SpeechRec();
+          recognition.lang = "id-ID";
+          recognition.onstart = () => {
             micBtn.classList.add("recording");
-            chatInput.placeholder = "Mendengarkan suara Anda...";
+            chatInput.placeholder = "Mendengarkan...";
           };
-
-          recognition.onresult = function (event) {
-            const transcript = event.results[0][0].transcript;
-            chatInput.value += (chatInput.value ? " " : "") + transcript;
+          recognition.onresult = (e) => {
+            chatInput.value += e.results[0][0].transcript;
           };
-
-          recognition.onerror = function (event) {
-            console.error("Kesalahan pengenalan suara:", event.error);
-            isRecording = false;
+          recognition.onend = () => {
             micBtn.classList.remove("recording");
-            chatInput.placeholder = "Tanya atau unggah gambar...";
+            chatInput.placeholder = "Tanya sesuatu...";
           };
-
-          recognition.onend = function () {
-            isRecording = false;
-            micBtn.classList.remove("recording");
-            chatInput.placeholder = "Tanya atau unggah gambar...";
-          };
-
-          micBtn.addEventListener("click", () => {
-            if (isRecording) {
-              recognition.stop();
-            } else {
-              recognition.start();
-            }
-          });
+          micBtn.addEventListener("click", () => recognition.start());
         } else {
-          // Sembunyikan tombol jika browser tidak mendukung
           micBtn.style.display = "none";
         }
 
-        // --- FUNGSI TEXT TO SPEECH API GEMINI ---
-        async function fetchTTS(text) {
-          const modelName = "gemini-2.5-flash-preview-tts";
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-
-          const payload = {
-            contents: [
-              {
-                parts: [
-                  {
-                    text: text,
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              responseModalities: ["AUDIO"],
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: {
-                    voiceName: "Kore", // Suara default
-                  },
-                },
-              },
-            },
-            model: modelName,
-          };
+        // --- Gemini API Logic ---
+        async function fetchGeminiResponse(userText, base64Img, mimeType) {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+          let parts = [{ text: `Riwayat: ${JSON.stringify(chatHistory.slice(-3))}\n\nUser: ${userText}` }];
+          if (base64Img) parts.push({ inline_data: { mime_type: mimeType, data: base64Img } });
 
           try {
-            const response = await fetch(url, {
+            const resp = await fetch(url, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
+              body: JSON.stringify({
+                contents: [{ parts }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+              })
             });
-
-            if (!response.ok) {
-              console.warn("TTS API Not OK", response.status);
-              return null; // Gagal TTS
-            }
-
-            const result = await response.json();
-
-            if (
-              result.candidates &&
-              result.candidates[0] &&
-              result.candidates[0].content &&
-              result.candidates[0].content.parts[0] &&
-              result.candidates[0].content.parts[0].inline_data
-            ) {
-              const inlineData =
-                result.candidates[0].content.parts[0].inline_data;
-              const pcmBase64 = inlineData.data;
-              const mimeType = inlineData.mime_type; // cth: audio/L16; rate=24000
-
-              // Ekstrak Sample Rate
-              let sampleRate = 24000;
-              const rateMatch = mimeType.match(/rate=(\d+)/);
-              if (rateMatch && rateMatch[1]) {
-                sampleRate = parseInt(rateMatch[1], 10);
-              }
-
-              // Decode Base64 ke ArrayBuffer
-              const binaryString = window.atob(pcmBase64);
-              const len = binaryString.length;
-              const bytes = new Uint8Array(len);
-              for (let i = 0; i < len; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-              }
-
-              // Konversi ke WAV
-              const wavBuffer = pcmToWav(bytes.buffer, sampleRate);
-              const wavBlob = new Blob([wavBuffer], { type: "audio/wav" });
-              const audioUrl = URL.createObjectURL(wavBlob);
-
-              return audioUrl;
-            }
-            return null;
-          } catch (error) {
-            console.error("Error TTS:", error);
-            return null;
+            const data = await resp.json();
+            return data.candidates[0].content.parts[0].text;
+          } catch (e) {
+            return "Maaf, server AI sedang sibuk. Coba lagi nanti.";
           }
         }
 
-        // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
-        let isAILoading = false; // Pengunci agar tidak spam klik
-
-        async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          if (isAILoading) return;
-          isAILoading = true;
-
-          const modelName = "gemini-flash-latest";
-          // Pastikan variabel 'apiKey' sudah didefinisikan di bagian atas script Anda
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-
-          // Manajemen Riwayat (Kontekstual Spasial)
-          chatHistory.push({ text: userText });
-          const recentHistoryText = chatHistory
-            .slice(-5)
-            .map((msg) => msg.text)
-            .join("\n---\n");
-
-          let partsArray = [
-            {
-              text: `Konteks Percakapan Sebelumnya:\n${recentHistoryText}\n\nPesan Pengguna Saat Ini: ${userText}`,
-            },
-          ];
-
-          // PERBAIKAN: Format data gambar untuk Google API (inline_data)
-          if (base64Img && mimeType) {
-            partsArray.push({
-              inline_data: {
-                mime_type: mimeType,
-                data: base64Img,
-              },
-            });
-          }
-
-          const payload = {
-            contents: [{ parts: partsArray }],
-            systemInstruction: {
-              parts: [{ text: systemPrompt }], // Pastikan 'systemPrompt' sudah didefinisikan
-            },
-          };
-
-          const delays = [1000, 2000, 4000, 8000, 16000]; // Jeda untuk Exponential Backoff
-
-          for (let i = 0; i <= delays.length; i++) {
+        async function fetchTTS(text) {
+            // TTS via Gemini (Experimental Audio)
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
             try {
-              const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
-
-              if (!response.ok) {
-                // Jika Error 429, lempar ke catch untuk mencoba lagi (retry)
-                if (response.status === 429 && i < delays.length) throw new Error("RATE_LIMIT");
-                throw new Error(`HTTP error! status: ${response.status}`);
-              }
-
-              const result = await response.json();
-              const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-              if (aiReply) {
-                chatHistory.push({ text: aiReply });
-                isAILoading = false;
-                return aiReply;
-              } else {
-                throw new Error("Format balasan API tidak terduga");
-              }
-            } catch (error) {
-              if (error.message !== "RATE_LIMIT" || i === delays.length) {
-                isAILoading = false;
-                return "Maaf, koneksi ke server AI saat ini sedang tidak stabil. Pastikan API key Anda valid dan domain terdaftar.";
-              }
-              // Menunggu sebelum mencoba lagi
-              await new Promise((resolve) => setTimeout(resolve, delays[i]));
-            }
-          }
+                const resp = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text }] }],
+                        generationConfig: { responseModalities: ["AUDIO"] }
+                    })
+                });
+                const data = await resp.json();
+                const audioData = data.candidates[0].content.parts[0].inline_data;
+                const wav = pcmToWav(Uint8Array.from(atob(audioData.data), c => c.charCodeAt(0)).buffer, 24000);
+                return URL.createObjectURL(new Blob([wav], { type: "audio/wav" }));
+            } catch (e) { return null; }
         }
-
-        // --- MANAJEMEN INTERAKSI UI ---
-        window.sendQuickAction = async function (text) {
-          chatInput.value = text;
-          sendMessage();
-        };
 
         async function sendMessage() {
           const text = chatInput.value.trim();
           if (!text && !currentBase64Image) return;
 
-          // Nonaktifkan input agar tidak terjadi spamming
-          chatInput.disabled = true;
-          sendBtn.disabled = true;
-          uploadBtn.disabled = true;
-          if (micBtn) micBtn.disabled = true;
-
-          const imgUrl = currentBase64Image
-            ? `data:${currentMimeType};base64,${currentBase64Image}`
-            : null;
-          
-          appendMessage(text || "Mengirim gambar...", "user", imgUrl);
-
-          const payloadImg = currentBase64Image;
-          const payloadMime = currentMimeType;
-
+          appendMessage(text || "Menganalisis gambar...", "user", currentBase64Image ? imgPreview.src : null);
           chatInput.value = "";
-          if (removeImgBtn) removeImgBtn.click(); // Reset preview gambar
-          if (quickActions) quickActions.style.display = "none";
+          const imgBase64 = currentBase64Image;
+          const imgMime = currentMimeType;
+          removeImgBtn.click();
+          quickActions.style.display = "none";
 
-          const typingIndicator = showTypingIndicator();
+          const loading = showTypingIndicator();
+          const aiReply = await fetchGeminiResponse(text, imgBase64, imgMime);
+          loading.remove();
 
-          // Panggil API Gemini
-          const replyText = await fetchGeminiResponse(text, payloadImg, payloadMime);
-
-          // Fitur Suara (TTS)
-          let audioUrl = null;
-          if (replyText && !replyText.startsWith("Maaf, koneksi")) {
-            const cleanText = replyText.replace(/[*#]/g, "").slice(0, 500);
-            audioUrl = await fetchTTS(cleanText);
-          }
-
-          if (document.getElementById("gt-typing")) {
-            document.getElementById("gt-typing").remove();
-          }
-
-          appendMessage(replyText, "ai", null, audioUrl);
-
-          // Aktifkan kembali input
-          chatInput.disabled = false;
-          sendBtn.disabled = false;
-          uploadBtn.disabled = false;
-          if (micBtn) micBtn.disabled = false;
-          chatInput.focus();
+          const audio = await fetchTTS(aiReply.slice(0, 200)); // TTS hanya 200 char pertama
+          appendMessage(aiReply, "ai", null, audio);
+          chatHistory.push({ user: text, ai: aiReply });
         }
 
-        // Event Listeners
         sendBtn.addEventListener("click", sendMessage);
-        chatInput.addEventListener("keypress", function (e) {
-          if (e.key === "Enter") sendMessage();
-        });
+        chatInput.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+        window.sendQuickAction = (t) => { chatInput.value = t; sendMessage(); };
       });
     </script>
   </body>
