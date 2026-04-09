@@ -1735,11 +1735,17 @@ loadTour()
         }
 
         // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
+        let isAILoading = false; // Pengunci agar tidak spam klik
+
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          // LOGIKA PINTAR:
+          if (isAILoading) return;
+          isAILoading = true;
+
           const modelName = "gemini-flash-latest";
+          // Pastikan variabel 'apiKey' sudah didefinisikan di bagian atas script Anda
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
+          // Manajemen Riwayat (Kontekstual Spasial)
           chatHistory.push({ text: userText });
           const recentHistoryText = chatHistory
             .slice(-5)
@@ -1752,28 +1758,24 @@ loadTour()
             },
           ];
 
-          // Tambahkan gambar ke payload jika ada
+          // PERBAIKAN: Format data gambar untuk Google API (inline_data)
           if (base64Img && mimeType) {
             partsArray.push({
-              inlineData: {
-                mimeType: mimeType,
+              inline_data: {
+                mime_type: mimeType,
                 data: base64Img,
               },
             });
           }
 
           const payload = {
-            contents: [
-              {
-                parts: partsArray,
-              },
-            ],
+            contents: [{ parts: partsArray }],
             systemInstruction: {
-              parts: [{ text: systemPrompt }],
+              parts: [{ text: systemPrompt }], // Pastikan 'systemPrompt' sudah didefinisikan
             },
           };
 
-          const delays = [1000, 2000, 4000, 8000, 16000];
+          const delays = [1000, 2000, 4000, 8000, 16000]; // Jeda untuk Exponential Backoff
 
           for (let i = 0; i <= delays.length; i++) {
             try {
@@ -1783,27 +1785,34 @@ loadTour()
                 body: JSON.stringify(payload),
               });
 
-              if (!response.ok)
+              if (!response.ok) {
+                // Jika Error 429, lempar ke catch untuk mencoba lagi (retry)
+                if (response.status === 429 && i < delays.length) throw new Error("RATE_LIMIT");
                 throw new Error(`HTTP error! status: ${response.status}`);
+              }
 
               const result = await response.json();
               const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
               if (aiReply) {
+                chatHistory.push({ text: aiReply });
+                isAILoading = false;
                 return aiReply;
               } else {
                 throw new Error("Format balasan API tidak terduga");
               }
             } catch (error) {
-              if (i === delays.length) {
-                return "Maaf, koneksi ke server AI saat ini sedang tidak stabil. Pastikan API key Anda valid jika diuji di luar platform ini.";
+              if (error.message !== "RATE_LIMIT" || i === delays.length) {
+                isAILoading = false;
+                return "Maaf, koneksi ke server AI saat ini sedang tidak stabil. Pastikan API key Anda valid dan domain terdaftar.";
               }
+              // Menunggu sebelum mencoba lagi
               await new Promise((resolve) => setTimeout(resolve, delays[i]));
             }
           }
         }
 
-        // Aksi cepat
+        // --- MANAJEMEN INTERAKSI UI ---
         window.sendQuickAction = async function (text) {
           chatInput.value = text;
           sendMessage();
@@ -1811,42 +1820,36 @@ loadTour()
 
         async function sendMessage() {
           const text = chatInput.value.trim();
-          if (!text && !currentBase64Image) return; // Butuh teks atau gambar
+          if (!text && !currentBase64Image) return;
 
+          // Nonaktifkan input agar tidak terjadi spamming
           chatInput.disabled = true;
           sendBtn.disabled = true;
           uploadBtn.disabled = true;
           if (micBtn) micBtn.disabled = true;
 
-          // Tampilkan pesan user (dan gambar jika ada)
           const imgUrl = currentBase64Image
             ? `data:${currentMimeType};base64,${currentBase64Image}`
             : null;
+          
           appendMessage(text || "Mengirim gambar...", "user", imgUrl);
 
-          // Simpan state gambar untuk dikirim ke API, lalu reset UI
           const payloadImg = currentBase64Image;
           const payloadMime = currentMimeType;
 
           chatInput.value = "";
-          removeImgBtn.click(); // Reset preview
-          quickActions.style.display = "none";
+          if (removeImgBtn) removeImgBtn.click(); // Reset preview gambar
+          if (quickActions) quickActions.style.display = "none";
 
           const typingIndicator = showTypingIndicator();
 
-          // 1. Dapatkan balasan teks dari AI
-          const replyText = await fetchGeminiResponse(
-            text,
-            payloadImg,
-            payloadMime,
-          );
+          // Panggil API Gemini
+          const replyText = await fetchGeminiResponse(text, payloadImg, payloadMime);
 
-          // 2. Opsional: Dapatkan suara (TTS)
+          // Fitur Suara (TTS)
           let audioUrl = null;
-          // Hanya jalankan TTS jika tidak error koneksi
-          if (!replyText.startsWith("Maaf, koneksi")) {
-            // Filter markdown dari text agar TTS terdengar lebih natural
-            const cleanText = replyText.replace(/[*#]/g, "").slice(0, 500); // Batasi panjang TTS
+          if (replyText && !replyText.startsWith("Maaf, koneksi")) {
+            const cleanText = replyText.replace(/[*#]/g, "").slice(0, 500);
             audioUrl = await fetchTTS(cleanText);
           }
 
@@ -1854,9 +1857,9 @@ loadTour()
             document.getElementById("gt-typing").remove();
           }
 
-          // Tampilkan balasan AI berserta tombol Play Audio jika berhasil
           appendMessage(replyText, "ai", null, audioUrl);
 
+          // Aktifkan kembali input
           chatInput.disabled = false;
           sendBtn.disabled = false;
           uploadBtn.disabled = false;
@@ -1864,6 +1867,7 @@ loadTour()
           chatInput.focus();
         }
 
+        // Event Listeners
         sendBtn.addEventListener("click", sendMessage);
         chatInput.addEventListener("keypress", function (e) {
           if (e.key === "Enter") sendMessage();
