@@ -1737,7 +1737,7 @@ loadTour()
 
       // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          const modelName = "gemini-1.5-flash-latest";
+          const modelName = "gemini-2.0-flash";
           
           // MENGGUNAKAN v1beta
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
