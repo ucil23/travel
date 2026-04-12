@@ -347,7 +347,7 @@ loadTour()
 <!doctype html>
 <html>
   <head>
-    <title>Project Tesis</title>
+    <title>GeoVentura</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta
       name="viewport"
@@ -1294,7 +1294,7 @@ loadTour()
             <div class="chat-avatar">GV</div>
             <div>
               <h3 class="chat-title">GeoVentura AI</h3>
-              <p class="chat-subtitle">Asisten Virtual Tesis</p>
+              <p class="chat-subtitle">Asisten Virtual GeoVentura</p>
             </div>
           </div>
           <button class="chat-close" id="gt-close-chat" aria-label="Tutup Chat">
@@ -1440,7 +1440,7 @@ loadTour()
       // Isi dengan API Key Anda (contoh: "AIzaSy...") JIKA Anda mengetesnya di
       // komputer Anda (Live Server) atau Hosting Anda sendiri.
       // =========================================================================
-      const apiKey = "AIzaSyDt0PIjQeUDAFkF3CCLp-oKUq_JCyA2t2k";
+      const apiKey = "AIzaSyDza2w_VxQcfeJJzxaa_4CqYIS7hVzFib4";
 
       document.addEventListener("DOMContentLoaded", function () {
         const chatFab = document.getElementById("gt-chat-fab");
@@ -1463,11 +1463,12 @@ loadTour()
         let currentMimeType = null;
 
         // Instruksi Sistem untuk membentuk persona AI
-        const systemPrompt = `Anda adalah asisten pemandu virtual resmi bernama "GeoVentura AI" untuk proyek Tesis Virtual Field Trip. 
-            Tugas Anda adalah memandu pengunjung yang sedang melihat panorama 360 derajat. 
-            Anda dapat melihat gambar yang diunggah pengunjung dan menganalisisnya, terutama jika terkait dengan batuan, geologi, atau lingkungan.
+        const systemPrompt = `Anda adalah asisten pemandu virtual resmi bernama "GeoVentura AI" untuk proyek Media Pembelajaran Virtual Field Trip. 
+            Tugas Anda adalah memandu pengunjung yang sedang melihat panorama 360 derajat terkait pemanfaatan sumber daya alam di Jawa Timur.
+            Wilayah yang dikaji pada Virtual Field Trip ini meliputi Desa Toyomarto Singosari, Desa Sekapuk Gresik, TNBTS, dan GeoPark Ijen.
+            Anda dapat melihat gambar yang diunggah pengunjung dan menganalisisnya, terutama jika terkait dengan SDA, batuan, geologi, atau lingkungan pada wilayah kajian.
             Bersikaplah ramah, akademis namun mudah dipahami, dan berikan penjelasan mendalam mengenai aspek geologi, lingkungan, atau pertanyaan relevan lainnya.
-            Jawablah dalam bahasa Indonesia. Format teks Anda dengan Markdown dasar (seperti **tebal** untuk penekanan) agar mudah dibaca.
+            Jawablah dalam bahasa Indonesia disertai dengan rujukannya. Format teks Anda dengan Markdown dasar (seperti **tebal** untuk penekanan) agar mudah dibaca.
             Jaga agar jawaban Anda informatif namun tidak terlalu panjang agar nyaman dibaca di widget chat kecil.`;
 
         // Riwayat percakapan
@@ -1653,7 +1654,7 @@ loadTour()
 
         // --- FUNGSI TEXT TO SPEECH API GEMINI ---
         async function fetchTTS(text) {
-          const modelName = "gemini-2.5-flash-preview-tts";
+          const modelName = "gemini-2.0-flash";
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
           const payload = {
@@ -1737,7 +1738,7 @@ loadTour()
         // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
           // LOGIKA PINTAR:
-          const modelName = "gemini-flash-latest";
+          const modelName = "gemini-1.5-flash";
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
           chatHistory.push({ text: userText });
