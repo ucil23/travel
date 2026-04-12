@@ -647,7 +647,7 @@ loadTour()
     };
 
     // Menggunakan Gemini 1.5 Flash (Sangat cepat dan gratis untuk multimodal)
-    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + CFG.apiKey;
+   var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + CFG.apiKey;
 
     var resp = await fetch(url, {
       method: 'POST',
