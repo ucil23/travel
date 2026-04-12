@@ -1735,11 +1735,12 @@ loadTour()
           }
         }
 
-        // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
+      // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          // LOGIKA PINTAR:
           const modelName = "gemini-1.5-flash";
-          const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
+          
+          // MENGGUNAKAN v1beta
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
           chatHistory.push({ text: userText });
           const recentHistoryText = chatHistory
@@ -1753,7 +1754,6 @@ loadTour()
             },
           ];
 
-          // Tambahkan gambar ke payload jika ada
           if (base64Img && mimeType) {
             partsArray.push({
               inlineData: {
@@ -1763,9 +1763,11 @@ loadTour()
             });
           }
 
+          // PERBAIKAN: Menambahkan role "user"
           const payload = {
             contents: [
               {
+                role: "user", // <-- INI SANGAT PENTING
                 parts: partsArray,
               },
             ],
@@ -1784,8 +1786,12 @@ loadTour()
                 body: JSON.stringify(payload),
               });
 
-              if (!response.ok)
+              if (!response.ok) {
+                // Trik Debugging: Mengambil pesan error asli dari Google
+                const errData = await response.json();
+                console.error("Detail Error API:", errData);
                 throw new Error(`HTTP error! status: ${response.status}`);
+              }
 
               const result = await response.json();
               const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
