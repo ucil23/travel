@@ -342,5 +342,424 @@ loadTour()
 <body onload="onLoad()">
     <div id="preloadContainer" style="background-color:rgba(255,255,255,1)"><div style="z-index: 4; position: absolute; left: 0%; top: 50%; width: 100.00%; height: 10.00%"><div style="text-align:left; color:#000; "><DIV STYLE="text-align:center;"><SPAN STYLE="letter-spacing:0vmin;color:#000000;font-family:Arial, Helvetica, sans-serif;"><SPAN STYLE="font-size:1.47vmin;">Tunggu bentar yaaaa.....</SPAN></SPAN></DIV></div></div></div>
     <div id="viewer"></div>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+<style>
+#vft-root *{box-sizing:border-box}
+#vft-root{font-family:'Nunito',sans-serif;position:fixed;bottom:0;right:0;z-index:10000}
+
+/* ── FAB ── */
+#vft-fab{position:fixed;bottom:24px;right:24px;width:64px;height:64px;border-radius:50%;background:#2d6a4f;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(45,106,79,.45);transition:transform .2s,background .2s;z-index:10001}
+#vft-fab:hover{background:#1b4332;transform:scale(1.08)}
+#vft-fab-icon{font-size:28px;line-height:1}
+#vft-badge{position:absolute;top:-2px;right:-2px;background:#f77f00;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px;font-family:'Nunito',sans-serif}
+
+/* ── WINDOW ── */
+#vft-win{position:fixed;bottom:100px;right:24px;width:345px;border-radius:20px;background:#fff;border:1px solid #d1d5db;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18);z-index:10000;transition:opacity .25s,transform .25s}
+#vft-win.closed{opacity:0;pointer-events:none;transform:translateY(16px) scale(.96)}
+#vft-win.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+
+/* ── HEADER ── */
+#vft-hdr{background:#2d6a4f;padding:13px 15px;display:flex;align-items:center;gap:10px}
+.vft-av{width:40px;height:40px;border-radius:50%;background:#40916c;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #74c69d;flex-shrink:0}
+.vft-nm{color:#d8f3dc;font-size:15px;font-weight:700;font-family:'Playfair Display',serif}
+.vft-st{color:#95d5b2;font-size:11px;display:flex;align-items:center;gap:4px;margin-top:1px}
+.vft-dot{width:5px;height:5px;background:#74c69d;border-radius:50%;display:inline-block}
+#vft-close{background:none;border:none;color:#95d5b2;cursor:pointer;margin-left:auto;font-size:20px;padding:4px 6px;border-radius:6px;transition:background .15s;line-height:1}
+#vft-close:hover{background:rgba(255,255,255,.15)}
+
+/* ── MESSAGES ── */
+#vft-msgs{height:290px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;background:#f5f7f5}
+#vft-msgs::-webkit-scrollbar{width:3px}
+#vft-msgs::-webkit-scrollbar-thumb{background:#b7e4c7;border-radius:3px}
+.vft-row{display:flex;gap:7px;align-items:flex-end}
+.vft-row.u{flex-direction:row-reverse}
+.vft-mav{width:27px;height:27px;border-radius:50%;background:#2d6a4f;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.vft-bub{max-width:78%;padding:9px 12px;border-radius:14px;font-size:13px;line-height:1.55}
+.vft-row.b .vft-bub{background:#fff;border:1px solid #e2e8e2;border-bottom-left-radius:3px;color:#1a1a1a}
+.vft-row.u .vft-bub{background:#2d6a4f;color:#d8f3dc;border-bottom-right-radius:3px}
+.vft-img-prev{max-width:150px;border-radius:10px;border:1px solid #e2e8e2;margin-bottom:6px;display:block}
+.vft-typing{display:flex;gap:3px;align-items:center;padding:2px 0}
+.vft-typing span{width:6px;height:6px;background:#95d5b2;border-radius:50%;animation:vftBounce 1.2s infinite;display:inline-block}
+.vft-typing span:nth-child(2){animation-delay:.2s}
+.vft-typing span:nth-child(3){animation-delay:.4s}
+@keyframes vftBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* ── SCAN BAR ── */
+#vft-scan-bar{display:flex;align-items:center;gap:8px;padding:9px 13px;background:#f0faf4;border-top:1px solid #c8e6c9}
+#vft-scan-btn{display:flex;align-items:center;gap:6px;background:#d8f3dc;color:#1b4332;border:none;border-radius:20px;padding:7px 13px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .15s}
+#vft-scan-btn:hover{background:#b7e4c7}
+#vft-scan-btn svg{width:14px;height:14px}
+#vft-scan-hint{font-size:10.5px;color:#52b788;margin-left:auto}
+#vft-scan-status{font-size:11px;color:#2d6a4f;font-weight:600;display:none}
+
+/* ── CHIPS ── */
+#vft-chips{padding:9px 12px;display:flex;flex-wrap:wrap;gap:5px;background:#f5f7f5;border-top:1px solid #e8ece8}
+.vft-chip{background:#d8f3dc;color:#1b4332;font-size:11px;font-weight:700;border:none;border-radius:20px;padding:5px 10px;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .15s}
+.vft-chip:hover{background:#b7e4c7}
+
+/* ── INPUT ROW ── */
+#vft-inp-row{display:flex;align-items:center;gap:7px;padding:11px 13px;border-top:1px solid #e8ece8;background:#fff}
+#vft-inp{flex:1;border:1px solid #ccc;border-radius:18px;padding:8px 13px;font-size:13px;background:#f9f9f9;color:#1a1a1a;outline:none;font-family:'Nunito',sans-serif;transition:border-color .2s}
+#vft-inp:focus{border-color:#2d6a4f}
+#vft-mic{width:35px;height:35px;border-radius:50%;background:#f3f4f6;border:1px solid #d1d5db;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;position:relative}
+#vft-mic:hover{background:#e5e7eb}
+#vft-mic.active{background:#fee2e2;border-color:#fca5a5;animation:vftPulse 1s infinite}
+@keyframes vftPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)}}
+#vft-mic svg{width:15px;height:15px;color:#374151}
+#vft-mic.active svg{color:#ef4444}
+#vft-send{width:35px;height:35px;border-radius:50%;background:#2d6a4f;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+#vft-send:hover{background:#1b4332}
+#vft-send:disabled{background:#95d5b2;cursor:not-allowed}
+#vft-send svg{width:14px;height:14px}
+
+/* ── MOBILE ── */
+@media(max-width:400px){
+  #vft-win{width:calc(100vw - 24px);right:12px;bottom:88px}
+}
+</style>
+
+<div id="vft-root">
+
+  <div id="vft-win" class="closed">
+
+    <div id="vft-hdr">
+      <div class="vft-av">🌿</div>
+      <div>
+        <div class="vft-nm">Pak Wisnu</div>
+        <div class="vft-st"><span class="vft-dot"></span> Pemandu Virtual Aktif</div>
+      </div>
+      <button id="vft-close" onclick="vftToggle()">✕</button>
+    </div>
+
+    <div id="vft-msgs">
+      <div class="vft-row b">
+        <div class="vft-mav">🌿</div>
+        <div class="vft-bub">Halo! Saya <b>Pak Wisnu</b> 👋<br>Kamu bisa:<br>• Ketik pertanyaan<br>• 🎤 Tekan mic untuk bicara<br>• 📷 Klik <b>Scan Objek</b> untuk analisis apa yang ada di depanmu!</div>
+      </div>
+    </div>
+
+    <div id="vft-scan-bar">
+      <button id="vft-scan-btn" onclick="vftStartScan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="4"/><path d="M3 9V6a3 3 0 013-3h3M15 3h3a3 3 0 013 3v3M21 15v3a3 3 0 01-3 3h-3M9 21H6a3 3 0 01-3-3v-3"/></svg>
+        Scan Objek 360°
+      </button>
+      <span id="vft-scan-hint">📷 AI analisis objek</span>
+      <span id="vft-scan-status">🔍 Menganalisis...</span>
+      <input type="file" id="vft-file" accept="image/*" capture="environment" style="display:none" onchange="vftHandleFile(event)">
+    </div>
+
+    <div id="vft-chips">
+      <button class="vft-chip" onclick="vftChip('Apa yang bisa dipelajari di lokasi ini?')">Apa yang ada di sini?</button>
+      <button class="vft-chip" onclick="vftChip('Ceritakan sejarah tempat ini!')">Sejarah tempat</button>
+      <button class="vft-chip" onclick="vftChip('Fakta menarik tentang lokasi ini?')">Fakta menarik</button>
+      <button class="vft-chip" onclick="vftChip('Apa manfaat belajar di tempat ini?')">Manfaat belajar</button>
+    </div>
+
+    <div id="vft-inp-row">
+      <input id="vft-inp" placeholder="Tanya Pak Wisnu..." onkeydown="if(event.key==='Enter')vftSend()">
+      <button id="vft-mic" onclick="vftToggleMic()" title="Bicara ke Pak Wisnu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="2" width="6" height="12" rx="3"/>
+          <path d="M5 10a7 7 0 0014 0M12 19v3M8 22h8"/>
+        </svg>
+      </button>
+      <button id="vft-send" onclick="vftSend()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <button id="vft-fab" onclick="vftToggle()">
+    <span id="vft-fab-icon">🌿</span>
+    <span id="vft-badge">1</span>
+  </button>
+</div>
+
+<script>
+(function () {
+
+  /* ════════════════════════════════════════
+     ⚙️  KONFIGURASI — EDIT BAGIAN INI
+  ════════════════════════════════════════ */
+  var CFG = {
+    apiKey:      'AIzaSyCwqbInxgILcDcAgMlixAs2hyXhI0C1r0E', // ← Ganti dengan API key Google AI Studio kamu
+    namaLokasi:  'Clungup Mangrove Conservation',     // ← Contoh: 'Candi Borobudur', 'Hutan Mangrove'
+    namaPemandu: 'Pak Wisnu',                // ← Boleh diganti nama lain
+    bahasa:      'id-ID',                    // ← Bahasa untuk speech recognition
+    maxHistory:  10,                         // ← Jumlah pesan yang dikirim ke API
+    autoCapture: true,                       // ← true = coba ambil canvas 360 otomatis; false = selalu file picker
+  };
+  /* ════════════════════════════════════════ */
+
+  var SYSTEM = 'Kamu adalah ' + CFG.namaPemandu + ', pemandu Virtual Field Trip yang sedang berlangsung di ' + CFG.namaLokasi + '.'
+    + ' Tugasmu memandu siswa/pengunjung dengan cara yang ramah, menarik, dan edukatif.'
+    + ' Gunakan bahasa Indonesia yang santai tapi informatif. Jawaban singkat 2-4 kalimat, sesekali pakai emoji relevan.'
+    + ' Jika menerima gambar, identifikasi semua objek yang terlihat, jelaskan nama, fungsi, fakta menarik, dan nilai edukasinya.';
+
+  var msgs = [], loading = false, chatOpen = false;
+  var recognition = null, isListening = false;
+
+  /* ── TOGGLE JENDELA ── */
+  window.vftToggle = function () {
+    chatOpen = !chatOpen;
+    document.getElementById('vft-win').className = chatOpen ? 'open' : 'closed';
+    document.getElementById('vft-badge').style.display = chatOpen ? 'none' : '';
+    if (chatOpen) setTimeout(function () { document.getElementById('vft-inp').focus(); }, 300);
+  };
+
+  /* ── CHIP SHORTCUT ── */
+  window.vftChip = function (text) {
+    document.getElementById('vft-inp').value = text;
+    document.getElementById('vft-chips').style.display = 'none';
+    vftSend();
+  };
+
+  /* ── KIRIM PESAN TEKS ── */
+  window.vftSend = async function () {
+    if (loading) return;
+    var inp = document.getElementById('vft-inp');
+    var text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    hideChips();
+    addMsg('u', text);
+    msgs.push({ role: 'user', content: text });
+    await runAPI();
+  };
+
+  /* ── SCAN OBJEK ── */
+  window.vftStartScan = function () {
+    if (CFG.autoCapture) {
+      // Coba capture canvas 360° dari 3D Vista
+      var canvas = document.querySelector('#viewer canvas');
+      if (canvas) {
+        try {
+          var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          var b64 = dataUrl.split(',')[1];
+          if (b64 && b64.length > 100) {
+            processImage(b64, 'image/jpeg', dataUrl);
+            return;
+          }
+        } catch (e) {
+          // Canvas terkunci, lanjut fallback
+        }
+      }
+    }
+    // Fallback: buka file picker
+    document.getElementById('vft-file').click();
+  };
+
+  /* ── HANDLE FILE UPLOAD ── */
+  window.vftHandleFile = function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var src = ev.target.result;
+      var b64 = src.split(',')[1];
+      processImage(b64, file.type, src);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  /* ── PROSES GAMBAR → KIRIM KE AI ── */
+  function processImage(b64, mediaType, previewSrc) {
+    hideChips();
+    addMsg('u', '📷 <em>Menganalisis objek dalam pandangan 360°...</em>', previewSrc);
+    // Push dummy text ke history UI
+    msgs.push({ role: 'user', content: '(siswa meminta analisis visual dari pandangan saat ini)' });
+
+    setScanStatus(true);
+    loading = true;
+    setSendDisabled(true);
+
+    var typingEl = addTyping();
+
+    callAPI(null, b64, mediaType).then(function (reply) {
+      typingEl.remove();
+      addMsg('b', reply);
+      msgs.push({ role: 'assistant', content: reply });
+    }).catch(function (e) {
+      typingEl.remove();
+      console.error(e);
+      addMsg('b', 'Maaf, gagal menganalisis gambar. Coba lagi ya! 🙏');
+    }).finally(function () {
+      setScanStatus(false);
+      loading = false;
+      setSendDisabled(false);
+    });
+  }
+
+  /* ── JALANKAN API (TEKS) ── */
+  async function runAPI() {
+    loading = true;
+    setSendDisabled(true);
+    var typingEl = addTyping();
+    try {
+      var reply = await callAPI(msgs);
+      typingEl.remove();
+      addMsg('b', reply);
+      msgs.push({ role: 'assistant', content: reply });
+    } catch (e) {
+      typingEl.remove();
+      console.error(e);
+      addMsg('b', 'Maaf, ada gangguan koneksi. Coba lagi ya! 🙏');
+    }
+    loading = false;
+    setSendDisabled(false);
+  }
+
+  /* ── PANGGIL GOOGLE GEMINI API ── */
+  async function callAPI(history, imgB64, imgType) {
+    var recent = (history || msgs).slice(-CFG.maxHistory);
+    var apiMsgs = [];
+
+    for (var i = 0; i < recent.length; i++) {
+      // Jika request berupa gambar, kita lewati dummy text terakhir agar Gemini tidak error (harus selang-seling role)
+      if (imgB64 && i === recent.length - 1) continue;
+
+      apiMsgs.push({
+        role: recent[i].role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: recent[i].content }]
+      });
+    }
+
+    // Jika ada gambar, tambahkan payload khusus gambar
+    if (imgB64) {
+      apiMsgs.push({
+        role: 'user',
+        parts: [
+          { inlineData: { mimeType: imgType || 'image/jpeg', data: imgB64 } },
+          { text: 'Tolong identifikasi dan jelaskan semua objek menarik yang terlihat dalam gambar ini dari sudut pandang edukatif! Sebutkan nama objek, fungsinya, fakta menarik, dan nilai belajarnya.' }
+        ]
+      });
+    }
+
+    var payload = {
+      systemInstruction: { parts: [{ text: SYSTEM }] },
+      contents: apiMsgs,
+      generationConfig: { maxOutputTokens: 700 }
+    };
+
+    // Menggunakan Gemini 1.5 Flash (Sangat cepat dan gratis untuk multimodal)
+    var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + CFG.apiKey;
+
+    var resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    var data = await resp.json();
+
+    if (data.error) throw new Error(data.error.message);
+    
+    // Penanganan jika respon diblokir/kosong
+    if (!data.candidates || data.candidates.length === 0) {
+      if (data.promptFeedback && data.promptFeedback.blockReason) {
+        return 'Maaf, pesan diblokir oleh sistem keamanan. Coba pertanyaan lain.';
+      }
+      return 'Maaf, tidak ada respon dari AI.';
+    }
+
+    var candidate = data.candidates[0];
+    if (candidate.finishReason !== 'STOP' && !candidate.content) {
+       return 'Maaf, respon dihentikan otomatis (Alasan: ' + candidate.finishReason + ').';
+    }
+
+    return candidate.content.parts[0].text;
+  }
+
+  /* ── SPEECH TO TEXT ── */
+  window.vftToggleMic = function () {
+    var supported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+    if (!supported) {
+      addMsg('b', 'Browser ini belum mendukung mikrofon otomatis. Gunakan Chrome/Edge ya! 😊');
+      return;
+    }
+    if (!recognition) {
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = CFG.bahasa;
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.onresult = function (e) {
+        var transcript = Array.from(e.results).map(function (r) { return r[0].transcript; }).join('');
+        document.getElementById('vft-inp').value = transcript;
+        if (e.results[e.results.length - 1].isFinal) {
+          stopMic();
+          vftSend();
+        }
+      };
+      recognition.onerror = stopMic;
+      recognition.onend = stopMic;
+    }
+    isListening ? stopMic() : startMic();
+  };
+
+  function startMic() {
+    isListening = true;
+    try { recognition.start(); } catch (e) {}
+    document.getElementById('vft-mic').classList.add('active');
+    document.getElementById('vft-inp').placeholder = '🎤 Bicara sekarang...';
+  }
+
+  function stopMic() {
+    isListening = false;
+    try { recognition.stop(); } catch (e) {}
+    document.getElementById('vft-mic').classList.remove('active');
+    document.getElementById('vft-inp').placeholder = 'Tanya Pak Wisnu...';
+  }
+
+  /* ── HELPERS UI ── */
+  var typingCounter = 0;
+
+  function addMsg(role, html, imgSrc) {
+    var c = document.getElementById('vft-msgs');
+    var d = document.createElement('div');
+    d.className = 'vft-row ' + role;
+    var inner = '';
+    if (role === 'b') inner += '<div class="vft-mav">🌿</div>';
+    inner += '<div class="vft-bub">';
+    if (imgSrc) inner += '<img src="' + imgSrc + '" class="vft-img-prev">';
+    inner += html + '</div>';
+    d.innerHTML = inner;
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+    return d;
+  }
+
+  function addTyping() {
+    var id = 'vft-typing-' + (++typingCounter);
+    var c = document.getElementById('vft-msgs');
+    var d = document.createElement('div');
+    d.className = 'vft-row b';
+    d.id = id;
+    d.innerHTML = '<div class="vft-mav">🌿</div><div class="vft-bub"><div class="vft-typing"><span></span><span></span><span></span></div></div>';
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+    return d;
+  }
+
+  function hideChips() {
+    document.getElementById('vft-chips').style.display = 'none';
+  }
+
+  function setSendDisabled(v) {
+    document.getElementById('vft-send').disabled = v;
+  }
+
+  function setScanStatus(active) {
+    document.getElementById('vft-scan-hint').style.display = active ? 'none' : '';
+    document.getElementById('vft-scan-status').style.display = active ? '' : 'none';
+  }
+
+})();
+</script>
 </body>
 </html>
