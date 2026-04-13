@@ -1737,7 +1737,7 @@ loadTour()
 
       // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          const modelName = "gemini-1.5-flash-latest";
+          const modelName = "gemini-1.5-flash";
           
           // Menggunakan v1 versi beta
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
@@ -1747,18 +1747,20 @@ loadTour()
             .slice(-5)
             .map((msg) => msg.text)
             .join("\n---\n");
-
+// --- LOGIKA PEMBERSIHAN BASE64 ---
+  // Kita definisikan variabelnya di sini agar bisa digunakan di bawah
+  const cleanBase64 = base64Img ? (base64Img.split(",")[1] || base64Img) : null;
           let partsArray = [
             {
               text: `Konteks Percakapan Sebelumnya:\n${recentHistoryText}\n\nPesan Pengguna Saat Ini: ${userText}`,
             },
           ];
 
-          if (base64Img && mimeType) {
+          if (cleanBase64 && mimeType) {
             partsArray.push({
               inline_data: {
                 mime_type: mimeType,
-                data: base64Img,
+                data: cleanBase64, // Gunakan yang sudah dibersihkan
               },
             });
           }
