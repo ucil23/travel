@@ -1,765 +1,1158 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>CVC </title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="user-scalable=no, initial-scale=0.54, width=device-width, viewport-fit=cover" />
-    <link rel="preload" href="script.js?v=1775995660279" as="script"/>
-<link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/l/2/0_0.jpg?v=1775995660279" as="image"/>
-<link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/r/2/0_0.jpg?v=1775995660279" as="image"/>
-<link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/u/2/0_0.jpg?v=1775995660279" as="image"/>
-<link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/d/2/0_0.jpg?v=1775995660279" as="image"/>
-<link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/f/2/0_0.jpg?v=1775995660279" as="image"/>
-<link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/b/2/0_0.jpg?v=1775995660279" as="image"/>
-<script>(function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,"script","//www.google-analytics.com/analytics.js","ga");ga("create", "UA-116087-3", "auto"); ga("send", "pageview");</script>
-<meta name="description" content="Virtual Tour"/>
-<meta name="theme-color" content="#FFFFFF"/>
-    <script src="lib/tdvplayer.js?v=1775995660279"></script>
-    <script type="text/javascript">
-        var player;
-        var playersPlayingTmp = [];
-        var isInitialized = false;
-        var isPaused = false;
+  <title>CVC </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="user-scalable=no, initial-scale=0.54, width=device-width, viewport-fit=cover" />
+  <link rel="preload" href="script.js?v=1775995660279" as="script" />
+  <link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/l/2/0_0.jpg?v=1775995660279"
+    as="image" />
+  <link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/r/2/0_0.jpg?v=1775995660279"
+    as="image" />
+  <link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/u/2/0_0.jpg?v=1775995660279"
+    as="image" />
+  <link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/d/2/0_0.jpg?v=1775995660279"
+    as="image" />
+  <link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/f/2/0_0.jpg?v=1775995660279"
+    as="image" />
+  <link rel="preload" href="media/panorama_E3C512A5_E8F9_AD4E_41EA_82FCDD6CE268_0/b/2/0_0.jpg?v=1775995660279"
+    as="image" />
+  <script>(function (i, s, o, g, r, a, m) { i["GoogleAnalyticsObject"] = r; i[r] = i[r] || function () { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o), m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m) })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga"); ga("create", "UA-116087-3", "auto"); ga("send", "pageview");</script>
+  <meta name="description" content="Virtual Tour" />
+  <meta name="theme-color" content="#FFFFFF" />
+  <script src="lib/tdvplayer.js?v=1775995660279"></script>
+  <script type="text/javascript">
+    var player;
+    var playersPlayingTmp = [];
+    var isInitialized = false;
+    var isPaused = false;
 
-        function loadTour()
-        {
-            if(player)
-                return;
+    function loadTour() {
+      if (player)
+        return;
 
-            var beginFunc = function(event){
-                if(event.name == 'begin')
-                {
-                    var camera = event.data.source.get('camera');
-                    if(camera && camera.get('initialSequence') && camera.get('initialSequence').get('movements').length > 0)
-                        return;
-                }
+      var beginFunc = function (event) {
+        if (event.name == 'begin') {
+          var camera = event.data.source.get('camera');
+          if (camera && camera.get('initialSequence') && camera.get('initialSequence').get('movements').length > 0)
+            return;
+        }
 
-                if(event.sourceClassName == "MediaAudio")
-                    return;
+        if (event.sourceClassName == "MediaAudio")
+          return;
 
-                isInitialized = true;
+        isInitialized = true;
 
-                player.unbind('preloadMediaShow', beginFunc, player, true);
-                player.unbindOnObjectsOf('PanoramaPlayListItem', 'begin', beginFunc, player, true);
-                player.unbind('stateChange', beginFunc, player, true);
-                window.parent.postMessage("tourLoaded", '*');
+        player.unbind('preloadMediaShow', beginFunc, player, true);
+        player.unbindOnObjectsOf('PanoramaPlayListItem', 'begin', beginFunc, player, true);
+        player.unbind('stateChange', beginFunc, player, true);
+        window.parent.postMessage("tourLoaded", '*');
 
-                disposePreloader();
+        disposePreloader();
 
-                onVirtualTourLoaded();
-            };
+        onVirtualTourLoaded();
+      };
 
-            var settings = new TDV.PlayerSettings();
-            
-            settings.set(TDV.PlayerSettings.CONTAINER, document.getElementById('viewer'));
-            settings.set(TDV.PlayerSettings.SCRIPT_URL, 'script.js?v=1775995660279');
-            settings.set(TDV.PlayerSettings.WEBVR_POLYFILL_URL, 'lib/WebVRPolyfill.js?v=1775995660279');
-            settings.set(TDV.PlayerSettings.HLS_URL, 'lib/Hls.js?v=1775995660279');
-            settings.set(TDV.PlayerSettings.QUERY_STRING_PARAMETERS, 'v=1775995660279');
-            window.tdvplayer = player = TDV.PlayerAPI.create(settings);
-            player.bind('preloadMediaShow', beginFunc, player, true);
-            player.bind('stateChange', beginFunc, player, true);
-            player.bindOnObjectsOf('PanoramaPlayListItem', 'begin', beginFunc, player, true);
-            player.bindOnObject('rootPlayer', 'start', function(e){
-                var queryDict = {}; location.search.substr(1).split("&").forEach(function(item) {var k = item.split("=")[0], v = decodeURIComponent(item.split("=")[1]);queryDict[k] = v});
-                var item = undefined;
-                if("media-index" in queryDict){
-                    item = setMediaByIndex(parseInt(queryDict["media-index"]) - 1);
-                }
-                else if("media-name" in queryDict){
-                    item = setMediaByName(queryDict["media-name"]);
-                }
-                else{
-                    item = setMediaByIndex(0);
-                }
-                if(item != undefined && "trigger-overlay-name" in queryDict){
-                    triggerOverlayByName(item, queryDict["trigger-overlay-name"], "trigger-overlay-event" in queryDict ? queryDict["trigger-overlay-event"] : "click");
-                }
+      var settings = new TDV.PlayerSettings();
 
-                player.getById('rootPlayer').bind('tourEnded', function(){
-                    onVirtualTourEnded();
-                }, player, true);
-            }, player, false);
+      settings.set(TDV.PlayerSettings.CONTAINER, document.getElementById('viewer'));
+      settings.set(TDV.PlayerSettings.SCRIPT_URL, 'script.js?v=1775995660279');
+      settings.set(TDV.PlayerSettings.WEBVR_POLYFILL_URL, 'lib/WebVRPolyfill.js?v=1775995660279');
+      settings.set(TDV.PlayerSettings.HLS_URL, 'lib/Hls.js?v=1775995660279');
+      settings.set(TDV.PlayerSettings.QUERY_STRING_PARAMETERS, 'v=1775995660279');
+      window.tdvplayer = player = TDV.PlayerAPI.create(settings);
+      player.bind('preloadMediaShow', beginFunc, player, true);
+      player.bind('stateChange', beginFunc, player, true);
+      player.bindOnObjectsOf('PanoramaPlayListItem', 'begin', beginFunc, player, true);
+      player.bindOnObject('rootPlayer', 'start', function (e) {
+        var queryDict = {}; location.search.substr(1).split("&").forEach(function (item) { var k = item.split("=")[0], v = decodeURIComponent(item.split("=")[1]); queryDict[k] = v });
+        var item = undefined;
+        if ("media-index" in queryDict) {
+          item = setMediaByIndex(parseInt(queryDict["media-index"]) - 1);
+        }
+        else if ("media-name" in queryDict) {
+          item = setMediaByName(queryDict["media-name"]);
+        }
+        else {
+          item = setMediaByIndex(0);
+        }
+        if (item != undefined && "trigger-overlay-name" in queryDict) {
+          triggerOverlayByName(item, queryDict["trigger-overlay-name"], "trigger-overlay-event" in queryDict ? queryDict["trigger-overlay-event"] : "click");
+        }
 
-            /* Listen messages */
-            window.addEventListener('message', function (e) {
-                //Listen to messages for make actions to player in the format function:param1,param2
-                var action = e.data;
-                if (action == 'pauseTour' || action == 'resumeTour') {
-                    this[action].apply(this);
-                }
+        player.getById('rootPlayer').bind('tourEnded', function () {
+          onVirtualTourEnded();
+        }, player, true);
+      }, player, false);
+
+      /* Listen messages */
+      window.addEventListener('message', function (e) {
+        //Listen to messages for make actions to player in the format function:param1,param2
+        var action = e.data;
+        if (action == 'pauseTour' || action == 'resumeTour') {
+          this[action].apply(this);
+        }
+      });
+    }
+
+    function pauseTour() {
+      isPaused = true;
+      if (!isInitialized)
+        return;
+
+      var playLists = player.getByClassName('PlayList');
+      for (var i = 0, count = playLists.length; i < count; i++) {
+        var playList = playLists[i];
+        var index = playList.get('selectedIndex');
+        if (index != -1) {
+          var item = playList.get('items')[index];
+          var itemPlayer = item.get('player');
+          if (itemPlayer && itemPlayer.pause) {
+            playersPlayingTmp.push(itemPlayer);
+            itemPlayer.pause();
+          }
+        }
+      }
+
+      player.getById('pauseGlobalAudios')();
+    }
+
+    function resumeTour() {
+      isPaused = false;
+      if (!isInitialized)
+        return;
+
+      while (playersPlayingTmp.length) {
+        var viewer = playersPlayingTmp.pop();
+        viewer.play();
+      }
+
+      player.getById('resumeGlobalAudios')();
+    }
+
+    function onVirtualTourLoaded() {
+      if (isPaused)
+        pauseTour();
+    }
+
+    function onVirtualTourEnded() {
+
+    }
+
+    function getRootPlayer() {
+      return window.tdvplayer !== undefined ? window.tdvplayer.getById('rootPlayer') : undefined;
+    }
+
+    function setMediaByIndex(index) {
+      var rootPlayer = getRootPlayer();
+      if (rootPlayer !== undefined) {
+        return rootPlayer.setMainMediaByIndex(index);
+      }
+    }
+
+    function setMediaByName(name) {
+      var rootPlayer = getRootPlayer();
+      if (rootPlayer !== undefined) {
+        return rootPlayer.setMainMediaByName(name);
+      }
+    }
+
+    function triggerOverlayByName(item, name, eventName) {
+      var rootPlayer = getRootPlayer();
+      if (rootPlayer !== undefined) {
+        item.bind('begin', function (e) {
+          item.unbind('begin', arguments.callee, this);
+          var overlay = rootPlayer.getPanoramaOverlayByName(item.get('media'), name);
+          if (overlay)
+            rootPlayer.triggerOverlay(overlay, eventName);
+        }, rootPlayer);
+      }
+    }
+
+    function showPreloader() {
+      var preloadContainer = document.getElementById('preloadContainer');
+      if (preloadContainer != undefined)
+        preloadContainer.style.opacity = 1;
+    }
+
+    function disposePreloader() {
+      var preloadContainer = document.getElementById('preloadContainer');
+      if (preloadContainer == undefined)
+        return;
+
+      var transitionEndName = transitionEndEventName();
+      if (transitionEndName) {
+        preloadContainer.addEventListener(transitionEndName, hide, false);
+        preloadContainer.style.opacity = 0;
+        setTimeout(hide, 500); //Force hide. Some cases the transitionend event isn't dispatched with an iFrame.
+      }
+      else {
+        hide();
+      }
+
+      function hide() {
+
+        preloadContainer.style.visibility = 'hidden';
+        preloadContainer.style.display = 'none';
+      }
+
+      function transitionEndEventName() {
+        var el = document.createElement('div');
+        var transitions = {
+          'transition': 'transitionend',
+          'OTransition': 'otransitionend',
+          'MozTransition': 'transitionend',
+          'WebkitTransition': 'webkitTransitionEnd'
+        };
+
+        var t;
+        for (t in transitions) {
+          if (el.style[t] !== undefined) {
+            return transitions[t];
+          }
+        }
+
+        return undefined;
+      }
+    }
+
+    function onBodyClick() {
+      document.body.removeEventListener("click", onBodyClick);
+      document.body.removeEventListener("touchend", onBodyClick);
+      loadTour();
+    }
+
+    function onLoad() {
+      if (/AppleWebKit/.test(navigator.userAgent) && /Mobile\/\w+/.test(navigator.userAgent)) {
+        var inIFrame = false;
+        try {
+          inIFrame = (window.self !== window.top);
+        }
+        catch (e) {
+          inIFrame = true;
+        }
+        if (!inIFrame) {
+          var onResize = function (async) {
+            [0, 250, 1000, 2000].forEach(function (delay) {
+              setTimeout(function () {
+                var viewer = document.querySelector('#viewer');
+                var scale = window.innerWidth / document.documentElement.clientWidth;
+                var width = document.documentElement.clientWidth;
+                var height = Math.round(window.innerHeight / scale);
+                viewer.style.width = width + 'px';
+                viewer.style.height = height + 'px';
+                viewer.style.left = Math.round((window.innerWidth - width) * 0.5) + 'px';
+                viewer.style.top = Math.round((window.innerHeight - height) * 0.5) + 'px';
+                viewer.style.transform = 'scale(' + scale + ', ' + scale + ')';
+                window.scrollTo(0, 0);
+              }, delay);
             });
+          };
+          window.addEventListener('resize', onResize);
+          onResize();
+        }
+      }
+
+
+      if (isOVRWeb()) {
+        showPreloader();
+        loadTour();
+        return;
+      }
+
+      showPreloader();
+      loadTour()
+    }
+
+    function playVideo(video) {
+      function isSafariDesktopV11orGreater() {
+        return /^((?!chrome|android|crios|ipad|iphone).)*safari/i.test(navigator.userAgent) && parseFloat(/Version\/([0-9]+\.[0-9]+)/i.exec(navigator.userAgent)[1]) >= 11;
+      }
+
+      function detectUserAction() {
+        var onVideoClick = function (e) {
+          if (video.paused) {
+            video.play();
+          }
+          video.muted = false;
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          video.removeEventListener('click', onVideoClick);
+          video.removeEventListener('touchend', onVideoClick);
+        };
+        video.addEventListener("click", onVideoClick);
+        video.addEventListener("touchend", onVideoClick);
+      }
+
+      if (isSafariDesktopV11orGreater()) {
+        video.muted = true;
+        video.play();
+      } else {
+        var canPlay = true;
+        var promise = video.play();
+        if (promise) {
+          promise.catch(function () {
+            video.muted = true;
+            video.play();
+            detectUserAction();
+          });
+        } else {
+          canPlay = false;
         }
 
-        function pauseTour()
-        {
-            isPaused = true;
-            if(!isInitialized)
-                return;
-
-            var playLists = player.getByClassName('PlayList');
-            for(var i = 0, count = playLists.length; i<count; i++)
-            {
-                var playList = playLists[i];
-                var index = playList.get('selectedIndex');
-                if(index != -1)
-                {
-                    var item = playList.get('items')[index];
-                    var itemPlayer = item.get('player');
-                    if(itemPlayer && itemPlayer.pause)
-                    {
-                        playersPlayingTmp.push(itemPlayer);
-                        itemPlayer.pause();
-                    }
-                }
-            }
-
-            player.getById('pauseGlobalAudios')();
+        if (!canPlay || video.muted) {
+          detectUserAction();
         }
+      }
+    }
 
-        function resumeTour()
-        {
-            isPaused = false;
-            if(!isInitialized)
-                return;
+    function isOVRWeb() {
+      return window.location.hash.substring(1).split('&').indexOf('ovrweb') > -1;
+    }
+  </script>
+  <style type="text/css">
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
 
-            while(playersPlayingTmp.length)
-            {
-                var viewer = playersPlayingTmp.pop();
-                viewer.play();
-            }
+    #viewer {
+      background-color: #000000;
+      z-index: 1;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+    }
 
-            player.getById('resumeGlobalAudios')();
-        }
-
-        function onVirtualTourLoaded()
-        {
-            if(isPaused)
-                pauseTour();
-        }
-
-        function onVirtualTourEnded()
-        {
-
-        }
-
-        function getRootPlayer()
-        {
-            return window.tdvplayer !== undefined ? window.tdvplayer.getById('rootPlayer') : undefined;
-        }
-
-        function setMediaByIndex(index)
-        {
-            var rootPlayer = getRootPlayer();
-            if(rootPlayer !== undefined) {
-                return rootPlayer.setMainMediaByIndex(index);
-            }
-        }
-
-        function setMediaByName(name)
-        {
-            var rootPlayer = getRootPlayer();
-            if(rootPlayer !== undefined) {
-                return rootPlayer.setMainMediaByName(name);
-            }
-        }
-
-        function triggerOverlayByName(item, name, eventName)
-        {
-            var rootPlayer = getRootPlayer();
-            if(rootPlayer !== undefined) {
-                item.bind('begin', function(e){
-                    item.unbind('begin', arguments.callee, this);
-                    var overlay = rootPlayer.getPanoramaOverlayByName(item.get('media'), name);
-                    if(overlay)
-                        rootPlayer.triggerOverlay(overlay, eventName);
-                }, rootPlayer);
-            }
-        }
-
-        function showPreloader()
-        {
-            var preloadContainer = document.getElementById('preloadContainer');
-            if(preloadContainer != undefined)
-                preloadContainer.style.opacity = 1;
-        }
-
-        function disposePreloader()
-        {
-            var preloadContainer = document.getElementById('preloadContainer');
-            if(preloadContainer == undefined)
-                return;
-
-            var transitionEndName = transitionEndEventName();
-            if(transitionEndName)
-            {
-                preloadContainer.addEventListener(transitionEndName, hide, false);
-                preloadContainer.style.opacity = 0;
-                setTimeout(hide, 500); //Force hide. Some cases the transitionend event isn't dispatched with an iFrame.
-            }
-            else
-            {
-                hide();
-            }
-
-            function hide()
-            {
-                
-                preloadContainer.style.visibility = 'hidden';
-                preloadContainer.style.display = 'none';
-            }
-
-            function transitionEndEventName () {
-                var el = document.createElement('div');
-                var transitions = {
-                        'transition':'transitionend',
-                        'OTransition':'otransitionend',
-                        'MozTransition':'transitionend',
-                        'WebkitTransition':'webkitTransitionEnd'
-                    };
-
-                var t;
-                for (t in transitions) {
-                    if (el.style[t] !== undefined) {
-                        return transitions[t];
-                    }
-                }
-
-                return undefined;
-            }
-        }
-
-        function onBodyClick(){
-            document.body.removeEventListener("click", onBodyClick);
-            document.body.removeEventListener("touchend", onBodyClick);
-            loadTour();
-        }
-
-        function onLoad() {
-            if (/AppleWebKit/.test(navigator.userAgent) && /Mobile\/\w+/.test(navigator.userAgent))
-            {
-                var inIFrame = false;
-                try
-                {
-                    inIFrame = (window.self !== window.top);
-                }
-                catch (e)
-                {
-                    inIFrame = true;
-                }
-                if (!inIFrame)
-                {
-                    var onResize = function(async)
-                    {
-                        [0, 250, 1000, 2000].forEach(function(delay)
-                        {
-                            setTimeout(function()
-                            {
-                                var viewer = document.querySelector('#viewer');
-                                var scale = window.innerWidth / document.documentElement.clientWidth;
-                                var width = document.documentElement.clientWidth;
-                                var height = Math.round(window.innerHeight / scale);
-                                viewer.style.width = width + 'px';
-                                viewer.style.height = height + 'px';
-                                viewer.style.left = Math.round((window.innerWidth - width) * 0.5) + 'px';
-                                viewer.style.top = Math.round((window.innerHeight - height) * 0.5) + 'px';
-                                viewer.style.transform = 'scale(' + scale + ', ' + scale + ')';
-                                window.scrollTo(0,0);
-                            }, delay);
-                        });
-                    };
-                    window.addEventListener('resize', onResize);
-                    onResize();
-                }
-            }
-
-
-            if (isOVRWeb()){
-                showPreloader();
-                loadTour();
-                return;
-            }
-
-            showPreloader();
-loadTour()
-        }
-
-        function playVideo(video) {
-            function isSafariDesktopV11orGreater() {
-                return /^((?!chrome|android|crios|ipad|iphone).)*safari/i.test(navigator.userAgent) && parseFloat(/Version\/([0-9]+\.[0-9]+)/i.exec(navigator.userAgent)[1]) >= 11;
-            }
-
-            function detectUserAction() {
-                var onVideoClick = function(e) {
-                    if(video.paused) {
-                        video.play();
-                    }
-                    video.muted = false;
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    e.preventDefault();
-                    video.removeEventListener('click', onVideoClick);
-                    video.removeEventListener('touchend', onVideoClick);
-                };
-                video.addEventListener("click", onVideoClick);
-                video.addEventListener("touchend", onVideoClick);
-            }
-
-            if (isSafariDesktopV11orGreater()) {
-                video.muted = true;
-                video.play();
-            } else {
-                var canPlay = true;
-                var promise = video.play();
-                if (promise) {
-                    promise.catch(function() {
-                        video.muted = true;
-                        video.play();
-                        detectUserAction();
-                    });
-                } else {
-                    canPlay = false;
-                }
-
-                if (!canPlay || video.muted) {
-                    detectUserAction();
-                }
-            }
-        }
-
-        function isOVRWeb(){
-            return window.location.hash.substring(1).split('&').indexOf('ovrweb') > -1;
-        }
-    </script>
-    <style type="text/css">
-        html, body { width: 100%; height: 100%; margin: 0; padding: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-
-        #viewer { background-color: #000000; z-index:1; position:absolute; width: 100%; height: 100%; top: 0; }
-        #preloadContainer { z-index:2; position:relative; width:100%; height:100%; transition: opacity 0.5s; -webkit-transition: opacity 0.5s; -moz-transition: opacity 0.5s; -o-transition: opacity 0.5s;}
-    </style>
-    <link rel="stylesheet" href="fonts.css?v=1775995660279">
+    #preloadContainer {
+      z-index: 2;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: opacity 0.5s;
+      -webkit-transition: opacity 0.5s;
+      -moz-transition: opacity 0.5s;
+      -o-transition: opacity 0.5s;
+    }
+  </style>
+  <link rel="stylesheet" href="fonts.css?v=1775995660279">
 </head>
+
 <body onload="onLoad()">
-    <div id="preloadContainer" style="background-color:rgba(255,255,255,1)"><div style="z-index: 4; position: absolute; left: 0%; top: 50%; width: 100.00%; height: 10.00%"><div style="text-align:left; color:#000; "><DIV STYLE="text-align:center;"><SPAN STYLE="letter-spacing:0vmin;color:#000000;font-family:Arial, Helvetica, sans-serif;"><SPAN STYLE="font-size:1.47vmin;">Tunggu bentar yaaaa.....</SPAN></SPAN></DIV></div></div></div>
-    <div id="viewer"></div>
-
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
-
-<style>
-#vft-root *{box-sizing:border-box}
-#vft-root{font-family:'Nunito',sans-serif;position:fixed;bottom:0;right:0;z-index:10000}
-
-/* ── FAB ── */
-#vft-fab{position:fixed;bottom:24px;right:24px;width:64px;height:64px;border-radius:50%;background:#2d6a4f;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(45,106,79,.45);transition:transform .2s,background .2s;z-index:10001}
-#vft-fab:hover{background:#1b4332;transform:scale(1.08)}
-#vft-fab-icon{font-size:28px;line-height:1}
-#vft-badge{position:absolute;top:-2px;right:-2px;background:#f77f00;color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px;font-family:'Nunito',sans-serif}
-
-/* ── WINDOW ── */
-#vft-win{position:fixed;bottom:100px;right:24px;width:345px;border-radius:20px;background:#fff;border:1px solid #d1d5db;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18);z-index:10000;transition:opacity .25s,transform .25s}
-#vft-win.closed{opacity:0;pointer-events:none;transform:translateY(16px) scale(.96)}
-#vft-win.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
-
-/* ── HEADER ── */
-#vft-hdr{background:#2d6a4f;padding:13px 15px;display:flex;align-items:center;gap:10px}
-.vft-av{width:40px;height:40px;border-radius:50%;background:#40916c;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid #74c69d;flex-shrink:0}
-.vft-nm{color:#d8f3dc;font-size:15px;font-weight:700;font-family:'Playfair Display',serif}
-.vft-st{color:#95d5b2;font-size:11px;display:flex;align-items:center;gap:4px;margin-top:1px}
-.vft-dot{width:5px;height:5px;background:#74c69d;border-radius:50%;display:inline-block}
-#vft-close{background:none;border:none;color:#95d5b2;cursor:pointer;margin-left:auto;font-size:20px;padding:4px 6px;border-radius:6px;transition:background .15s;line-height:1}
-#vft-close:hover{background:rgba(255,255,255,.15)}
-
-/* ── MESSAGES ── */
-#vft-msgs{height:290px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:9px;background:#f5f7f5}
-#vft-msgs::-webkit-scrollbar{width:3px}
-#vft-msgs::-webkit-scrollbar-thumb{background:#b7e4c7;border-radius:3px}
-.vft-row{display:flex;gap:7px;align-items:flex-end}
-.vft-row.u{flex-direction:row-reverse}
-.vft-mav{width:27px;height:27px;border-radius:50%;background:#2d6a4f;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.vft-bub{max-width:78%;padding:9px 12px;border-radius:14px;font-size:13px;line-height:1.55}
-.vft-row.b .vft-bub{background:#fff;border:1px solid #e2e8e2;border-bottom-left-radius:3px;color:#1a1a1a}
-.vft-row.u .vft-bub{background:#2d6a4f;color:#d8f3dc;border-bottom-right-radius:3px}
-.vft-img-prev{max-width:150px;border-radius:10px;border:1px solid #e2e8e2;margin-bottom:6px;display:block}
-.vft-typing{display:flex;gap:3px;align-items:center;padding:2px 0}
-.vft-typing span{width:6px;height:6px;background:#95d5b2;border-radius:50%;animation:vftBounce 1.2s infinite;display:inline-block}
-.vft-typing span:nth-child(2){animation-delay:.2s}
-.vft-typing span:nth-child(3){animation-delay:.4s}
-@keyframes vftBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-
-/* ── SCAN BAR ── */
-#vft-scan-bar{display:flex;align-items:center;gap:8px;padding:9px 13px;background:#f0faf4;border-top:1px solid #c8e6c9}
-#vft-scan-btn{display:flex;align-items:center;gap:6px;background:#d8f3dc;color:#1b4332;border:none;border-radius:20px;padding:7px 13px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .15s}
-#vft-scan-btn:hover{background:#b7e4c7}
-#vft-scan-btn svg{width:14px;height:14px}
-#vft-scan-hint{font-size:10.5px;color:#52b788;margin-left:auto}
-#vft-scan-status{font-size:11px;color:#2d6a4f;font-weight:600;display:none}
-
-/* ── CHIPS ── */
-#vft-chips{padding:9px 12px;display:flex;flex-wrap:wrap;gap:5px;background:#f5f7f5;border-top:1px solid #e8ece8}
-.vft-chip{background:#d8f3dc;color:#1b4332;font-size:11px;font-weight:700;border:none;border-radius:20px;padding:5px 10px;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .15s}
-.vft-chip:hover{background:#b7e4c7}
-
-/* ── INPUT ROW ── */
-#vft-inp-row{display:flex;align-items:center;gap:7px;padding:11px 13px;border-top:1px solid #e8ece8;background:#fff}
-#vft-inp{flex:1;border:1px solid #ccc;border-radius:18px;padding:8px 13px;font-size:13px;background:#f9f9f9;color:#1a1a1a;outline:none;font-family:'Nunito',sans-serif;transition:border-color .2s}
-#vft-inp:focus{border-color:#2d6a4f}
-#vft-mic{width:35px;height:35px;border-radius:50%;background:#f3f4f6;border:1px solid #d1d5db;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;position:relative}
-#vft-mic:hover{background:#e5e7eb}
-#vft-mic.active{background:#fee2e2;border-color:#fca5a5;animation:vftPulse 1s infinite}
-@keyframes vftPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.3)}50%{box-shadow:0 0 0 7px rgba(239,68,68,0)}}
-#vft-mic svg{width:15px;height:15px;color:#374151}
-#vft-mic.active svg{color:#ef4444}
-#vft-send{width:35px;height:35px;border-radius:50%;background:#2d6a4f;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
-#vft-send:hover{background:#1b4332}
-#vft-send:disabled{background:#95d5b2;cursor:not-allowed}
-#vft-send svg{width:14px;height:14px}
-
-/* ── MOBILE ── */
-@media(max-width:400px){
-  #vft-win{width:calc(100vw - 24px);right:12px;bottom:88px}
-}
-</style>
-
-<div id="vft-root">
-
-  <div id="vft-win" class="closed">
-
-    <div id="vft-hdr">
-      <div class="vft-av">🌿</div>
-      <div>
-        <div class="vft-nm">Pak Wisnu</div>
-        <div class="vft-st"><span class="vft-dot"></span> Pemandu Virtual Aktif</div>
+  <div id="preloadContainer" style="background-color:rgba(255,255,255,1)">
+    <div style="z-index: 4; position: absolute; left: 0%; top: 50%; width: 100.00%; height: 10.00%">
+      <div style="text-align:left; color:#000; ">
+        <DIV STYLE="text-align:center;"><SPAN
+            STYLE="letter-spacing:0vmin;color:#000000;font-family:Arial, Helvetica, sans-serif;"><SPAN
+              STYLE="font-size:1.47vmin;">Tunggu bentar yaaaa.....</SPAN></SPAN></DIV>
       </div>
-      <button id="vft-close" onclick="vftToggle()">✕</button>
-    </div>
-
-    <div id="vft-msgs">
-      <div class="vft-row b">
-        <div class="vft-mav">🌿</div>
-        <div class="vft-bub">Halo! Saya <b>Pak Wisnu</b> 👋<br>Kamu bisa:<br>• Ketik pertanyaan<br>• 🎤 Tekan mic untuk bicara<br>• 📷 Klik <b>Scan Objek</b> untuk analisis apa yang ada di depanmu!</div>
-      </div>
-    </div>
-
-    <div id="vft-scan-bar">
-      <button id="vft-scan-btn" onclick="vftStartScan()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="4"/><path d="M3 9V6a3 3 0 013-3h3M15 3h3a3 3 0 013 3v3M21 15v3a3 3 0 01-3 3h-3M9 21H6a3 3 0 01-3-3v-3"/></svg>
-        Scan Objek 360°
-      </button>
-      <span id="vft-scan-hint">📷 AI analisis objek</span>
-      <span id="vft-scan-status">🔍 Menganalisis...</span>
-      <input type="file" id="vft-file" accept="image/*" capture="environment" style="display:none" onchange="vftHandleFile(event)">
-    </div>
-
-    <div id="vft-chips">
-      <button class="vft-chip" onclick="vftChip('Apa yang bisa dipelajari di lokasi ini?')">Apa yang ada di sini?</button>
-      <button class="vft-chip" onclick="vftChip('Ceritakan sejarah tempat ini!')">Sejarah tempat</button>
-      <button class="vft-chip" onclick="vftChip('Fakta menarik tentang lokasi ini?')">Fakta menarik</button>
-      <button class="vft-chip" onclick="vftChip('Apa manfaat belajar di tempat ini?')">Manfaat belajar</button>
-    </div>
-
-    <div id="vft-inp-row">
-      <input id="vft-inp" placeholder="Tanya Pak Wisnu..." onkeydown="if(event.key==='Enter')vftSend()">
-      <button id="vft-mic" onclick="vftToggleMic()" title="Bicara ke Pak Wisnu">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="2" width="6" height="12" rx="3"/>
-          <path d="M5 10a7 7 0 0014 0M12 19v3M8 22h8"/>
-        </svg>
-      </button>
-      <button id="vft-send" onclick="vftSend()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-          <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/>
-        </svg>
-      </button>
     </div>
   </div>
+  <div id="viewer"></div>
 
-  <button id="vft-fab" onclick="vftToggle()">
-    <span id="vft-fab-icon">🌿</span>
-    <span id="vft-badge">1</span>
-  </button>
-</div>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Playfair+Display:wght@600&display=swap"
+    rel="stylesheet">
 
-<script>
-(function () {
+  <style>
+    #vft-root * {
+      box-sizing: border-box
+    }
 
-  /* ════════════════════════════════════════
-     ⚙️  KONFIGURASI — EDIT BAGIAN INI
-  ════════════════════════════════════════ */
-  var CFG = {
-    apiKey:      'AIzaSyCwqbInxgILcDcAgMlixAs2hyXhI0C1r0E', // ← Ganti dengan API key Google AI Studio kamu
-    namaLokasi:  'Clungup Mangrove Conservation',     // ← Contoh: 'Candi Borobudur', 'Hutan Mangrove'
-    namaPemandu: 'Pak Wisnu',                // ← Boleh diganti nama lain
-    bahasa:      'id-ID',                    // ← Bahasa untuk speech recognition
-    maxHistory:  10,                         // ← Jumlah pesan yang dikirim ke API
-    autoCapture: true,                       // ← true = coba ambil canvas 360 otomatis; false = selalu file picker
-  };
-  /* ════════════════════════════════════════ */
+    #vft-root {
+      font-family: 'Nunito', sans-serif;
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      z-index: 10000
+    }
 
-  var SYSTEM = 'Kamu adalah ' + CFG.namaPemandu + ', pemandu Virtual Field Trip yang sedang berlangsung di ' + CFG.namaLokasi + '.'
-    + ' Tugasmu memandu siswa/pengunjung dengan cara yang ramah, menarik, dan edukatif.'
-    + ' Gunakan bahasa Indonesia yang santai tapi informatif. Jawaban singkat 2-4 kalimat, sesekali pakai emoji relevan.'
-    + ' Jika menerima gambar, identifikasi semua objek yang terlihat, jelaskan nama, fungsi, fakta menarik, dan nilai edukasinya.';
+    /* ── FAB ── */
+    #vft-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(45, 106, 79, .45);
+      transition: transform .2s, background .2s;
+      z-index: 10001
+    }
 
-  var msgs = [], loading = false, chatOpen = false;
-  var recognition = null, isListening = false;
+    #vft-fab:hover {
+      background: #1b4332;
+      transform: scale(1.08)
+    }
 
-  /* ── TOGGLE JENDELA ── */
-  window.vftToggle = function () {
-    chatOpen = !chatOpen;
-    document.getElementById('vft-win').className = chatOpen ? 'open' : 'closed';
-    document.getElementById('vft-badge').style.display = chatOpen ? 'none' : '';
-    if (chatOpen) setTimeout(function () { document.getElementById('vft-inp').focus(); }, 300);
-  };
+    #vft-fab-icon {
+      font-size: 28px;
+      line-height: 1
+    }
 
-  /* ── CHIP SHORTCUT ── */
-  window.vftChip = function (text) {
-    document.getElementById('vft-inp').value = text;
-    document.getElementById('vft-chips').style.display = 'none';
-    vftSend();
-  };
+    #vft-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: #f77f00;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 2px 6px;
+      font-family: 'Nunito', sans-serif
+    }
 
-  /* ── KIRIM PESAN TEKS ── */
-  window.vftSend = async function () {
-    if (loading) return;
-    var inp = document.getElementById('vft-inp');
-    var text = inp.value.trim();
-    if (!text) return;
-    inp.value = '';
-    hideChips();
-    addMsg('u', text);
-    msgs.push({ role: 'user', content: text });
-    await runAPI();
-  };
+    /* ── WINDOW ── */
+    #vft-win {
+      position: fixed;
+      bottom: 100px;
+      right: 24px;
+      width: 345px;
+      border-radius: 20px;
+      background: #fff;
+      border: 1px solid #d1d5db;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .18);
+      z-index: 10000;
+      transition: opacity .25s, transform .25s
+    }
 
-  /* ── SCAN OBJEK ── */
-  window.vftStartScan = function () {
-    if (CFG.autoCapture) {
-      // Coba capture canvas 360° dari 3D Vista
-      var canvas = document.querySelector('#viewer canvas');
-      if (canvas) {
-        try {
-          var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-          var b64 = dataUrl.split(',')[1];
-          if (b64 && b64.length > 100) {
-            processImage(b64, 'image/jpeg', dataUrl);
-            return;
-          }
-        } catch (e) {
-          // Canvas terkunci, lanjut fallback
-        }
+    #vft-win.closed {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(16px) scale(.96)
+    }
+
+    #vft-win.open {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0) scale(1)
+    }
+
+    /* ── HEADER ── */
+    #vft-hdr {
+      background: #2d6a4f;
+      padding: 13px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .vft-av {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #40916c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      border: 2px solid #74c69d;
+      flex-shrink: 0
+    }
+
+    .vft-nm {
+      color: #d8f3dc;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif
+    }
+
+    .vft-st {
+      color: #95d5b2;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px
+    }
+
+    .vft-dot {
+      width: 5px;
+      height: 5px;
+      background: #74c69d;
+      border-radius: 50%;
+      display: inline-block
+    }
+
+    #vft-close {
+      background: none;
+      border: none;
+      color: #95d5b2;
+      cursor: pointer;
+      margin-left: auto;
+      font-size: 20px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background .15s;
+      line-height: 1
+    }
+
+    #vft-close:hover {
+      background: rgba(255, 255, 255, .15)
+    }
+
+    /* ── MESSAGES ── */
+    #vft-msgs {
+      height: 290px;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      background: #f5f7f5
+    }
+
+    #vft-msgs::-webkit-scrollbar {
+      width: 3px
+    }
+
+    #vft-msgs::-webkit-scrollbar-thumb {
+      background: #b7e4c7;
+      border-radius: 3px
+    }
+
+    .vft-row {
+      display: flex;
+      gap: 7px;
+      align-items: flex-end
+    }
+
+    .vft-row.u {
+      flex-direction: row-reverse
+    }
+
+    .vft-mav {
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0
+    }
+
+    .vft-bub {
+      max-width: 78%;
+      padding: 9px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.55
+    }
+
+    .vft-row.b .vft-bub {
+      background: #fff;
+      border: 1px solid #e2e8e2;
+      border-bottom-left-radius: 3px;
+      color: #1a1a1a
+    }
+
+    .vft-row.u .vft-bub {
+      background: #2d6a4f;
+      color: #d8f3dc;
+      border-bottom-right-radius: 3px
+    }
+
+    .vft-img-prev {
+      max-width: 150px;
+      border-radius: 10px;
+      border: 1px solid #e2e8e2;
+      margin-bottom: 6px;
+      display: block
+    }
+
+    .vft-typing {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+      padding: 2px 0
+    }
+
+    .vft-typing span {
+      width: 6px;
+      height: 6px;
+      background: #95d5b2;
+      border-radius: 50%;
+      animation: vftBounce 1.2s infinite;
+      display: inline-block
+    }
+
+    .vft-typing span:nth-child(2) {
+      animation-delay: .2s
+    }
+
+    .vft-typing span:nth-child(3) {
+      animation-delay: .4s
+    }
+
+    @keyframes vftBounce {
+
+      0%,
+      60%,
+      100% {
+        transform: translateY(0)
+      }
+
+      30% {
+        transform: translateY(-6px)
       }
     }
-    // Fallback: buka file picker
-    document.getElementById('vft-file').click();
-  };
 
-  /* ── HANDLE FILE UPLOAD ── */
-  window.vftHandleFile = function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-      var src = ev.target.result;
-      var b64 = src.split(',')[1];
-      processImage(b64, file.type, src);
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
-
-  /* ── PROSES GAMBAR → KIRIM KE AI ── */
-  function processImage(b64, mediaType, previewSrc) {
-    hideChips();
-    addMsg('u', '📷 <em>Menganalisis objek dalam pandangan 360°...</em>', previewSrc);
-    // Push dummy text ke history UI
-    msgs.push({ role: 'user', content: '(siswa meminta analisis visual dari pandangan saat ini)' });
-
-    setScanStatus(true);
-    loading = true;
-    setSendDisabled(true);
-
-    var typingEl = addTyping();
-
-    callAPI(null, b64, mediaType).then(function (reply) {
-      typingEl.remove();
-      addMsg('b', reply);
-      msgs.push({ role: 'assistant', content: reply });
-    }).catch(function (e) {
-      typingEl.remove();
-      console.error(e);
-      addMsg('b', 'Maaf, gagal menganalisis gambar. Coba lagi ya! 🙏');
-    }).finally(function () {
-      setScanStatus(false);
-      loading = false;
-      setSendDisabled(false);
-    });
-  }
-
-  /* ── JALANKAN API (TEKS) ── */
-  async function runAPI() {
-    loading = true;
-    setSendDisabled(true);
-    var typingEl = addTyping();
-    try {
-      var reply = await callAPI(msgs);
-      typingEl.remove();
-      addMsg('b', reply);
-      msgs.push({ role: 'assistant', content: reply });
-    } catch (e) {
-      typingEl.remove();
-      console.error(e);
-      addMsg('b', 'Maaf, ada gangguan koneksi. Coba lagi ya! 🙏');
-    }
-    loading = false;
-    setSendDisabled(false);
-  }
-
-  /* ── PANGGIL GOOGLE GEMINI API ── */
-  async function callAPI(history, imgB64, imgType) {
-    var recent = (history || msgs).slice(-CFG.maxHistory);
-    var apiMsgs = [];
-
-    for (var i = 0; i < recent.length; i++) {
-      // Jika request berupa gambar, kita lewati dummy text terakhir agar Gemini tidak error (harus selang-seling role)
-      if (imgB64 && i === recent.length - 1) continue;
-
-      apiMsgs.push({
-        role: recent[i].role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: recent[i].content }]
-      });
+    /* ── SCAN BAR ── */
+    #vft-scan-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      background: #f0faf4;
+      border-top: 1px solid #c8e6c9
     }
 
-    // Jika ada gambar, tambahkan payload khusus gambar
-    if (imgB64) {
-      apiMsgs.push({
-        role: 'user',
-        parts: [
-          { inlineData: { mimeType: imgType || 'image/jpeg', data: imgB64 } },
-          { text: 'Tolong identifikasi dan jelaskan semua objek menarik yang terlihat dalam gambar ini dari sudut pandang edukatif! Sebutkan nama objek, fungsinya, fakta menarik, dan nilai belajarnya.' }
-        ]
-      });
+    #vft-scan-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #d8f3dc;
+      color: #1b4332;
+      border: none;
+      border-radius: 20px;
+      padding: 7px 13px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: background .15s
     }
 
-    var payload = {
-      systemInstruction: { parts: [{ text: SYSTEM }] },
-      contents: apiMsgs,
-      generationConfig: { maxOutputTokens: 700 }
-    };
+    #vft-scan-btn:hover {
+      background: #b7e4c7
+    }
 
-    // Menggunakan Gemini 1.5 Flash (Sangat cepat dan gratis untuk multimodal)
-   var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + CFG.apiKey;
+    #vft-scan-btn svg {
+      width: 14px;
+      height: 14px
+    }
 
-    var resp = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    #vft-scan-hint {
+      font-size: 10.5px;
+      color: #52b788;
+      margin-left: auto
+    }
 
-    var data = await resp.json();
+    #vft-scan-status {
+      font-size: 11px;
+      color: #2d6a4f;
+      font-weight: 600;
+      display: none
+    }
 
-    if (data.error) throw new Error(data.error.message);
-    
-    // Penanganan jika respon diblokir/kosong
-    if (!data.candidates || data.candidates.length === 0) {
-      if (data.promptFeedback && data.promptFeedback.blockReason) {
-        return 'Maaf, pesan diblokir oleh sistem keamanan. Coba pertanyaan lain.';
+    /* ── CHIPS ── */
+    #vft-chips {
+      padding: 9px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      background: #f5f7f5;
+      border-top: 1px solid #e8ece8
+    }
+
+    .vft-chip {
+      background: #d8f3dc;
+      color: #1b4332;
+      font-size: 11px;
+      font-weight: 700;
+      border: none;
+      border-radius: 20px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: background .15s
+    }
+
+    .vft-chip:hover {
+      background: #b7e4c7
+    }
+
+    /* ── INPUT ROW ── */
+    #vft-inp-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 11px 13px;
+      border-top: 1px solid #e8ece8;
+      background: #fff
+    }
+
+    #vft-inp {
+      flex: 1;
+      border: 1px solid #ccc;
+      border-radius: 18px;
+      padding: 8px 13px;
+      font-size: 13px;
+      background: #f9f9f9;
+      color: #1a1a1a;
+      outline: none;
+      font-family: 'Nunito', sans-serif;
+      transition: border-color .2s
+    }
+
+    #vft-inp:focus {
+      border-color: #2d6a4f
+    }
+
+    #vft-mic {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .15s;
+      position: relative
+    }
+
+    #vft-mic:hover {
+      background: #e5e7eb
+    }
+
+    #vft-mic.active {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      animation: vftPulse 1s infinite
+    }
+
+    @keyframes vftPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, .3)
       }
-      return 'Maaf, tidak ada respon dari AI.';
+
+      50% {
+        box-shadow: 0 0 0 7px rgba(239, 68, 68, 0)
+      }
     }
 
-    var candidate = data.candidates[0];
-    if (candidate.finishReason !== 'STOP' && !candidate.content) {
-       return 'Maaf, respon dihentikan otomatis (Alasan: ' + candidate.finishReason + ').';
+    #vft-mic svg {
+      width: 15px;
+      height: 15px;
+      color: #374151
     }
 
-    return candidate.content.parts[0].text;
-  }
-
-  /* ── SPEECH TO TEXT ── */
-  window.vftToggleMic = function () {
-    var supported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
-    if (!supported) {
-      addMsg('b', 'Browser ini belum mendukung mikrofon otomatis. Gunakan Chrome/Edge ya! 😊');
-      return;
+    #vft-mic.active svg {
+      color: #ef4444
     }
-    if (!recognition) {
-      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SR();
-      recognition.lang = CFG.bahasa;
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.onresult = function (e) {
-        var transcript = Array.from(e.results).map(function (r) { return r[0].transcript; }).join('');
-        document.getElementById('vft-inp').value = transcript;
-        if (e.results[e.results.length - 1].isFinal) {
-          stopMic();
-          vftSend();
-        }
+
+    #vft-send {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: #2d6a4f;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background .15s
+    }
+
+    #vft-send:hover {
+      background: #1b4332
+    }
+
+    #vft-send:disabled {
+      background: #95d5b2;
+      cursor: not-allowed
+    }
+
+    #vft-send svg {
+      width: 14px;
+      height: 14px
+    }
+
+    /* ── MOBILE ── */
+    @media(max-width:400px) {
+      #vft-win {
+        width: calc(100vw - 24px);
+        right: 12px;
+        bottom: 88px
+      }
+    }
+  </style>
+
+  <div id="vft-root">
+
+    <div id="vft-win" class="closed">
+
+      <div id="vft-hdr">
+        <div class="vft-av">🌿</div>
+        <div>
+          <div class="vft-nm">Pak Wisnu</div>
+          <div class="vft-st"><span class="vft-dot"></span> Pemandu Virtual Aktif</div>
+        </div>
+        <button id="vft-close" onclick="vftToggle()">✕</button>
+      </div>
+
+      <div id="vft-msgs">
+        <div class="vft-row b">
+          <div class="vft-mav">🌿</div>
+          <div class="vft-bub">Halo! Saya <b>Pak Wisnu</b> 👋<br>Kamu bisa:<br>• Ketik pertanyaan<br>• 🎤 Tekan mic
+            untuk bicara<br>• 📷 Klik <b>Scan Objek</b> untuk analisis apa yang ada di depanmu!</div>
+        </div>
+      </div>
+
+      <div id="vft-scan-bar">
+        <button id="vft-scan-btn" onclick="vftStartScan()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="3" y="3" width="18" height="18" rx="3" />
+            <circle cx="12" cy="12" r="4" />
+            <path d="M3 9V6a3 3 0 013-3h3M15 3h3a3 3 0 013 3v3M21 15v3a3 3 0 01-3 3h-3M9 21H6a3 3 0 01-3-3v-3" />
+          </svg>
+          Scan Objek 360°
+        </button>
+        <span id="vft-scan-hint">📷 AI analisis objek</span>
+        <span id="vft-scan-status">🔍 Menganalisis...</span>
+        <input type="file" id="vft-file" accept="image/*" capture="environment" style="display:none"
+          onchange="vftHandleFile(event)">
+      </div>
+
+      <div id="vft-chips">
+        <button class="vft-chip" onclick="vftChip('Apa yang bisa dipelajari di lokasi ini?')">Apa yang ada di
+          sini?</button>
+        <button class="vft-chip" onclick="vftChip('Ceritakan sejarah tempat ini!')">Sejarah tempat</button>
+        <button class="vft-chip" onclick="vftChip('Fakta menarik tentang lokasi ini?')">Fakta menarik</button>
+        <button class="vft-chip" onclick="vftChip('Apa manfaat belajar di tempat ini?')">Manfaat belajar</button>
+      </div>
+
+      <div id="vft-inp-row">
+        <input id="vft-inp" placeholder="Tanya Pak Wisnu..." onkeydown="if(event.key==='Enter')vftSend()">
+        <button id="vft-mic" onclick="vftToggleMic()" title="Bicara ke Pak Wisnu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="2" width="6" height="12" rx="3" />
+            <path d="M5 10a7 7 0 0014 0M12 19v3M8 22h8" />
+          </svg>
+        </button>
+        <button id="vft-send" onclick="vftSend()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button id="vft-fab" onclick="vftToggle()">
+      <span id="vft-fab-icon">🌿</span>
+      <span id="vft-badge">1</span>
+    </button>
+  </div>
+
+  <script>
+    (function () {
+
+      /* ════════════════════════════════════════
+         ⚙️  KONFIGURASI — EDIT BAGIAN INI
+      ════════════════════════════════════════ */
+      var CFG = {
+        apiKey: 'AIzaSyD5mQ2R2briaUNnUfyPsTL95Rt0l_jpfKQ', // ← Ganti dengan API key Google AI Studio kamu
+        namaLokasi: 'Clungup Mangrove Conservation',     // ← Contoh: 'Candi Borobudur', 'Hutan Mangrove'
+        namaPemandu: 'Pak Wisnu',                // ← Boleh diganti nama lain
+        bahasa: 'id-ID',                    // ← Bahasa untuk speech recognition
+        maxHistory: 10,                         // ← Jumlah pesan yang dikirim ke API
+        autoCapture: true,                       // ← true = coba ambil canvas 360 otomatis; false = selalu file picker
       };
-      recognition.onerror = stopMic;
-      recognition.onend = stopMic;
-    }
-    isListening ? stopMic() : startMic();
-  };
+      /* ════════════════════════════════════════ */
 
-  function startMic() {
-    isListening = true;
-    try { recognition.start(); } catch (e) {}
-    document.getElementById('vft-mic').classList.add('active');
-    document.getElementById('vft-inp').placeholder = '🎤 Bicara sekarang...';
-  }
+      var SYSTEM = 'Kamu adalah ' + CFG.namaPemandu + ', pemandu Virtual Field Trip yang sedang berlangsung di ' + CFG.namaLokasi + '.'
+        + ' Tugasmu memandu siswa/pengunjung dengan cara yang ramah, menarik, dan edukatif.'
+        + ' Gunakan bahasa Indonesia yang santai tapi informatif. Jawaban singkat 2-4 kalimat, sesekali pakai emoji relevan.'
+        + ' Jika menerima gambar, identifikasi semua objek yang terlihat, jelaskan nama, fungsi, fakta menarik, dan nilai edukasinya.';
 
-  function stopMic() {
-    isListening = false;
-    try { recognition.stop(); } catch (e) {}
-    document.getElementById('vft-mic').classList.remove('active');
-    document.getElementById('vft-inp').placeholder = 'Tanya Pak Wisnu...';
-  }
+      var msgs = [], loading = false, chatOpen = false;
+      var recognition = null, isListening = false;
 
-  /* ── HELPERS UI ── */
-  var typingCounter = 0;
+      /* ── TOGGLE JENDELA ── */
+      window.vftToggle = function () {
+        chatOpen = !chatOpen;
+        document.getElementById('vft-win').className = chatOpen ? 'open' : 'closed';
+        document.getElementById('vft-badge').style.display = chatOpen ? 'none' : '';
+        if (chatOpen) setTimeout(function () { document.getElementById('vft-inp').focus(); }, 300);
+      };
 
-  function addMsg(role, html, imgSrc) {
-    var c = document.getElementById('vft-msgs');
-    var d = document.createElement('div');
-    d.className = 'vft-row ' + role;
-    var inner = '';
-    if (role === 'b') inner += '<div class="vft-mav">🌿</div>';
-    inner += '<div class="vft-bub">';
-    if (imgSrc) inner += '<img src="' + imgSrc + '" class="vft-img-prev">';
-    inner += html + '</div>';
-    d.innerHTML = inner;
-    c.appendChild(d);
-    c.scrollTop = c.scrollHeight;
-    return d;
-  }
+      /* ── CHIP SHORTCUT ── */
+      window.vftChip = function (text) {
+        document.getElementById('vft-inp').value = text;
+        document.getElementById('vft-chips').style.display = 'none';
+        vftSend();
+      };
 
-  function addTyping() {
-    var id = 'vft-typing-' + (++typingCounter);
-    var c = document.getElementById('vft-msgs');
-    var d = document.createElement('div');
-    d.className = 'vft-row b';
-    d.id = id;
-    d.innerHTML = '<div class="vft-mav">🌿</div><div class="vft-bub"><div class="vft-typing"><span></span><span></span><span></span></div></div>';
-    c.appendChild(d);
-    c.scrollTop = c.scrollHeight;
-    return d;
-  }
+      /* ── KIRIM PESAN TEKS ── */
+      window.vftSend = async function () {
+        if (loading) return;
+        var inp = document.getElementById('vft-inp');
+        var text = inp.value.trim();
+        if (!text) return;
+        inp.value = '';
+        hideChips();
+        addMsg('u', text);
+        msgs.push({ role: 'user', content: text });
+        await runAPI();
+      };
 
-  function hideChips() {
-    document.getElementById('vft-chips').style.display = 'none';
-  }
+      /* ── SCAN OBJEK ── */
+      window.vftStartScan = function () {
+        if (CFG.autoCapture) {
+          // Coba capture canvas 360° dari 3D Vista
+          var canvas = document.querySelector('#viewer canvas');
+          if (canvas) {
+            try {
+              var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+              var b64 = dataUrl.split(',')[1];
+              if (b64 && b64.length > 100) {
+                processImage(b64, 'image/jpeg', dataUrl);
+                return;
+              }
+            } catch (e) {
+              // Canvas terkunci, lanjut fallback
+            }
+          }
+        }
+        // Fallback: buka file picker
+        document.getElementById('vft-file').click();
+      };
 
-  function setSendDisabled(v) {
-    document.getElementById('vft-send').disabled = v;
-  }
+      /* ── HANDLE FILE UPLOAD ── */
+      window.vftHandleFile = function (e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (ev) {
+          var src = ev.target.result;
+          var b64 = src.split(',')[1];
+          processImage(b64, file.type, src);
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+      };
 
-  function setScanStatus(active) {
-    document.getElementById('vft-scan-hint').style.display = active ? 'none' : '';
-    document.getElementById('vft-scan-status').style.display = active ? '' : 'none';
-  }
+      /* ── PROSES GAMBAR → KIRIM KE AI ── */
+      function processImage(b64, mediaType, previewSrc) {
+        hideChips();
+        addMsg('u', '📷 <em>Menganalisis objek dalam pandangan 360°...</em>', previewSrc);
+        // Push dummy text ke history UI
+        msgs.push({ role: 'user', content: '(siswa meminta analisis visual dari pandangan saat ini)' });
 
-})();
-</script>
+        setScanStatus(true);
+        loading = true;
+        setSendDisabled(true);
+
+        var typingEl = addTyping();
+
+        callAPI(null, b64, mediaType).then(function (reply) {
+          typingEl.remove();
+          addMsg('b', reply);
+          msgs.push({ role: 'assistant', content: reply });
+        }).catch(function (e) {
+          typingEl.remove();
+          console.error(e);
+          addMsg('b', 'Maaf, gagal menganalisis gambar. Coba lagi ya! 🙏');
+          msgs.pop();
+        }).finally(function () {
+          setScanStatus(false);
+          loading = false;
+          setSendDisabled(false);
+        });
+      }
+
+      /* ── JALANKAN API (TEKS) ── */
+      async function runAPI() {
+        loading = true;
+        setSendDisabled(true);
+        var typingEl = addTyping();
+        try {
+          var reply = await callAPI(msgs);
+          typingEl.remove();
+          addMsg('b', reply);
+          msgs.push({ role: 'assistant', content: reply });
+        } catch (e) {
+          typingEl.remove();
+          console.error(e);
+          addMsg('b', 'Maaf, ada gangguan koneksi. Coba lagi ya! 🙏');
+          msgs.pop();
+        }
+        loading = false;
+        setSendDisabled(false);
+      }
+
+      /* ── PANGGIL GOOGLE GEMINI API ── */
+      async function callAPI(history, imgB64, imgType) {
+        var recent = (history || msgs).slice(-CFG.maxHistory);
+        var apiMsgs = [];
+
+        for (var i = 0; i < recent.length; i++) {
+          // Jika request berupa gambar, kita lewati dummy text terakhir agar Gemini tidak error (harus selang-seling role)
+          if (imgB64 && i === recent.length - 1) continue;
+
+          apiMsgs.push({
+            role: recent[i].role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: recent[i].content }]
+          });
+        }
+
+        // Jika ada gambar, tambahkan payload khusus gambar
+        if (imgB64) {
+          apiMsgs.push({
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType: imgType || 'image/jpeg', data: imgB64 } },
+              { text: 'Tolong identifikasi dan jelaskan semua objek menarik yang terlihat dalam gambar ini dari sudut pandang edukatif! Sebutkan nama objek, fungsinya, fakta menarik, dan nilai belajarnya.' }
+            ]
+          });
+        }
+
+        var payload = {
+          systemInstruction: { parts: [{ text: SYSTEM }] },
+          contents: apiMsgs,
+          generationConfig: { maxOutputTokens: 700 }
+        };
+
+        // Menggunakan Gemini 1.5 Flash (Sangat cepat dan gratis untuk multimodal)
+        var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + CFG.apiKey;
+
+        var resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        var data = await resp.json();
+
+        if (data.error) throw new Error(data.error.message);
+
+        // Penanganan jika respon diblokir/kosong
+        if (!data.candidates || data.candidates.length === 0) {
+          if (data.promptFeedback && data.promptFeedback.blockReason) {
+            return 'Maaf, pesan diblokir oleh sistem keamanan. Coba pertanyaan lain.';
+          }
+          return 'Maaf, tidak ada respon dari AI.';
+        }
+
+        var candidate = data.candidates[0];
+        if (candidate.finishReason !== 'STOP' && !candidate.content) {
+          return 'Maaf, respon dihentikan otomatis (Alasan: ' + candidate.finishReason + ').';
+        }
+
+        return candidate.content.parts[0].text;
+      }
+
+      /* ── SPEECH TO TEXT ── */
+      window.vftToggleMic = function () {
+        var supported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+        if (!supported) {
+          addMsg('b', 'Browser ini belum mendukung mikrofon otomatis. Gunakan Chrome/Edge ya! 😊');
+          return;
+        }
+        if (!recognition) {
+          var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+          recognition = new SR();
+          recognition.lang = CFG.bahasa;
+          recognition.continuous = false;
+          recognition.interimResults = true;
+          recognition.onresult = function (e) {
+            var transcript = Array.from(e.results).map(function (r) { return r[0].transcript; }).join('');
+            document.getElementById('vft-inp').value = transcript;
+            if (e.results[e.results.length - 1].isFinal) {
+              stopMic();
+              vftSend();
+            }
+          };
+          recognition.onerror = stopMic;
+          recognition.onend = stopMic;
+        }
+        isListening ? stopMic() : startMic();
+      };
+
+      function startMic() {
+        isListening = true;
+        try { recognition.start(); } catch (e) { }
+        document.getElementById('vft-mic').classList.add('active');
+        document.getElementById('vft-inp').placeholder = '🎤 Bicara sekarang...';
+      }
+
+      function stopMic() {
+        isListening = false;
+        try { recognition.stop(); } catch (e) { }
+        document.getElementById('vft-mic').classList.remove('active');
+        document.getElementById('vft-inp').placeholder = 'Tanya Pak Wisnu...';
+      }
+
+      /* ── HELPERS UI ── */
+      var typingCounter = 0;
+
+      function addMsg(role, html, imgSrc) {
+        var c = document.getElementById('vft-msgs');
+        var d = document.createElement('div');
+        d.className = 'vft-row ' + role;
+        var inner = '';
+        if (role === 'b') inner += '<div class="vft-mav">🌿</div>';
+        inner += '<div class="vft-bub">';
+        if (imgSrc) inner += '<img src="' + imgSrc + '" class="vft-img-prev">';
+        inner += html + '</div>';
+        d.innerHTML = inner;
+        c.appendChild(d);
+        c.scrollTop = c.scrollHeight;
+        return d;
+      }
+
+      function addTyping() {
+        var id = 'vft-typing-' + (++typingCounter);
+        var c = document.getElementById('vft-msgs');
+        var d = document.createElement('div');
+        d.className = 'vft-row b';
+        d.id = id;
+        d.innerHTML = '<div class="vft-mav">🌿</div><div class="vft-bub"><div class="vft-typing"><span></span><span></span><span></span></div></div>';
+        c.appendChild(d);
+        c.scrollTop = c.scrollHeight;
+        return d;
+      }
+
+      function hideChips() {
+        document.getElementById('vft-chips').style.display = 'none';
+      }
+
+      function setSendDisabled(v) {
+        document.getElementById('vft-send').disabled = v;
+      }
+
+      function setScanStatus(active) {
+        document.getElementById('vft-scan-hint').style.display = active ? 'none' : '';
+        document.getElementById('vft-scan-status').style.display = active ? '' : 'none';
+      }
+
+    })();
+  </script>
 </body>
+
 </html>
