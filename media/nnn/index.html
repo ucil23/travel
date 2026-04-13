@@ -1740,7 +1740,7 @@ loadTour()
           const modelName = "gemini-1.5-flash";
           
           // Menggunakan v1 versi beta
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+          const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
 
           chatHistory.push({ text: userText });
           const recentHistoryText = chatHistory
@@ -1758,8 +1758,8 @@ loadTour()
 
           if (cleanBase64 && mimeType) {
             partsArray.push({
-              inline_data: {
-                mime_type: mimeType,
+              inlineData: {
+                mimeType: mimeType,
                 data: cleanBase64, // Gunakan yang sudah dibersihkan
               },
             });
@@ -1773,7 +1773,7 @@ loadTour()
                 parts: partsArray,
               },
             ],
-            system_instruction: {
+            systemInstruction: {
               parts: [{ text: systemPrompt }],
             },
           };
