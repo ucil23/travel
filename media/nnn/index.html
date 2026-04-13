@@ -1739,8 +1739,8 @@ loadTour()
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
           const modelName = "gemini-1.5-flash-latest";
           
-          // Menggunakan v1 versi stabil
-          const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
+          // Menggunakan v1 versi beta
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
 
           chatHistory.push({ text: userText });
           const recentHistoryText = chatHistory
