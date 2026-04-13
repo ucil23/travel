@@ -1737,7 +1737,7 @@ loadTour()
 
       // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          const modelName = "gemini-1.5-flash";
+          const modelName = "gemini-1.5-flash-latest";
           
           // Menggunakan v1 versi stabil
           const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
@@ -1756,8 +1756,8 @@ loadTour()
 
           if (base64Img && mimeType) {
             partsArray.push({
-              inlineData: {
-                mimeType: mimeType,
+              inline_data: {
+                mime_type: mimeType,
                 data: base64Img,
               },
             });
@@ -1771,7 +1771,7 @@ loadTour()
                 parts: partsArray,
               },
             ],
-            systemInstruction: {
+            system_instruction: {
               parts: [{ text: systemPrompt }],
             },
           };
