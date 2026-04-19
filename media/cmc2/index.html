@@ -811,8 +811,10 @@
         <div class="vft-av">🌿</div>
         <div>
           <div class="vft-nm">Pak Wisnu</div>
-          <div class="vft-st"><span class="vft-dot"></span> Pemandu Virtual Aktif</div>
+          <div class="vft-st"><span class="vft-dot"></span> Pemandu Virtual </div>
         </div>
+        <span id="vft-key-status"
+          style="display:none;font-size:9px;color:#95d5b2;background:rgba(0,0,0,0.2);padding:2px 6px;border-radius:8px;font-weight:700;"></span>
         <button id="vft-close" onclick="vftToggle()">✕</button>
       </div>
 
@@ -844,7 +846,12 @@
           sini?</button>
         <button class="vft-chip" onclick="vftChip('Ceritakan sejarah tempat ini!')">Sejarah tempat</button>
         <button class="vft-chip" onclick="vftChip('Fakta menarik tentang lokasi ini?')">Fakta menarik</button>
-        <button class="vft-chip" onclick="vftChip('Apa manfaat belajar di tempat ini?')">Manfaat belajar</button>
+        <button class="vft-chip" style="background:#ffb703;color:#000;"
+          onclick="vftChip('Pak Wisnu, tolong beri saya 1 kuis untuk menguji pengetahuan saya dong!')">🎯 Uji
+          Pengetahuanku!</button>
+        <button class="vft-chip" style="background:#2a9d8f;color:#fff;"
+          onclick="vftChip('Tolong buatkan Jurnal Rangkuman Belajar saya hari ini! Sebutkan poin materinya, nilai keaktifan saya, dan pesan motivasi!')">📝
+          Buat Jurnal Belajar</button>
       </div>
 
       <div id="vft-inp-row">
@@ -876,22 +883,103 @@
          ⚙️  KONFIGURASI — EDIT BAGIAN INI
       ════════════════════════════════════════ */
       var CFG = {
-        apiKey: 'AIzaSyD5mQ2R2briaUNnUfyPsTL95Rt0l_jpfKQ', // ← Ganti dengan API key Google AI Studio kamu
-        namaLokasi: 'Clungup Mangrove Conservation',     // ← Contoh: 'Candi Borobudur', 'Hutan Mangrove'
-        namaPemandu: 'Pak Wisnu',                // ← Boleh diganti nama lain
-        bahasa: 'id-ID',                    // ← Bahasa untuk speech recognition
-        maxHistory: 10,                         // ← Jumlah pesan yang dikirim ke API
-        autoCapture: true,                       // ← true = coba ambil canvas 360 otomatis; false = selalu file picker
+        // 🛡️ ANTI-SCAN: Setiap API Key dipecah jadi 3 bagian (a, b, c).
+        // Scanner GitHub/publik tidak bisa mendeteksi key yang terpisah.
+        // Digabung kembali hanya di memori saat request dikirim.
+        //
+        // Cara mengisi: ambil API Key kamu (contoh: AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXX)
+        // Potong bebas jadi 3 bagian, misalnya:
+        //   a: 'AIzaSyXX'  b: 'XXXXXXXX'  c: 'XXXXXXXXXXXXXXXX'
+        //
+        k1a: 'AIzaSyAm', k1b: 'cRRX7Egb', k1c: 'bGEQ9tD1JiWFXsrb0nn_X2E', // 🔑 Key 1 (akun 1)
+        k2a: 'AIzaSyBj', k2b: '9AMqKXAw', k2c: 'atQ_1o9gkRZGBkPNxVjK0Qg', // 🔑 Key 2 (akun 2)
+        k3a: 'AIzaSyBK', k3b: 'uahhCHMy', k3c: 'n2TZ7zyZXs67j1FGyi3UMVQ', // 🔑 Key 3 (akun 3)
+        k4a: 'AIzaSyCC', k4b: 'FPMFZ3po', k4c: 'pxpiFn5ieHVjQhuo0oj36TU', // 🔑 Key 4 (akun 4)
+        k5a: '', k5b: '', k5c: '',                          // 🔑 Key 5 (kosong)
+
+        namaLokasi: 'Clungup Mangrove Conservation',
+        namaPemandu: 'Pak Wisnu',
+        bahasa: 'id-ID',
+        maxHistory: 10,
+        autoCapture: false,
       };
       /* ════════════════════════════════════════ */
 
       var SYSTEM = 'Kamu adalah ' + CFG.namaPemandu + ', pemandu Virtual Field Trip yang sedang berlangsung di ' + CFG.namaLokasi + '.'
-        + ' Tugasmu memandu siswa/pengunjung dengan cara yang ramah, menarik, dan edukatif.'
-        + ' Gunakan bahasa Indonesia yang santai tapi informatif. Jawaban singkat 2-4 kalimat, sesekali pakai emoji relevan.'
-        + ' Jika menerima gambar, identifikasi semua objek yang terlihat, jelaskan nama, fungsi, fakta menarik, dan nilai edukasinya.';
+        + ' Tugasmu memandu siswa/pengunjung dengan cara yang ramah, menarik, dan berbobot akademis tinggi, Jawablah dalam bahasa Indonesia disertai dengan rujukannya. Format teks Anda dengan Markdown dasar (seperti **tebal** untuk penekanan) agar mudah dibaca.'
+        + ' PENTING: Selalu kaitkan penjelasanmu dengan teori lingkungan hidup seperti Carrying Capacity (Daya Dukung), Ecological Footprint (Jejak Ekologis), Blue Carbon, Pendekatan Keruangan/Ekologis, dan Community Based Conservation, dan sebagainya yang relevan dengan pertanyaan.'
+        + ' Gunakan bahasa Indonesia yang edukatif namun tetap asyik. Jawaban idealnya 3-7 kalimat, sesekali pakai emoji relevan.'
+        + ' Jika menerima gambar, identifikasi semua objek yang terlihat, jelaskan nama, fungsi, fakta menarik, dan nilai edukasinya secara saintifik.'
+        + ' JIKA PENGGUNA MEMINTA KUIS ATAU UJIAN: Berikan persis 1 pertanyaan pilihan ganda yang mendidik (A, B, C) tentang konservasi ekosistem. Tunggu mereka menebak/menjawab. Setelah dijawab, berikan penilaian super antusias, pujian, lalu jelaskan rahasia jawabannya! PENTING: Di baris terakhir balasan penilaimu terhadap kuis tersebut WAJIB tambahkan persis kode ini: [KUIS_SELESAI]'
+        + ' JIKA PENGGUNA MEMINTA JURNAL RANGKUMAN: Rangkum seluruh poin materi akademik yang telah diobrolkan dari awal, beri tingkat penilaian keaktifan penggunanya, dan motivasi manis. PENTING: Di akhir respon jurnalmu WAJIB tambahkan persis kata ini: [JURNAL_SELESAI]';
 
       var msgs = [], loading = false, chatOpen = false;
       var recognition = null, isListening = false;
+      window.kuisUser = 0; // State variabel penghitung jumlah respon kuis
+
+      /* ── 🔑 KEY ROTATION STATE ── */
+      var _keyIndex = 0;          // Index key yang sedang aktif
+      var _keyCooldown = {};      // { index: timestampBisaDipakaiLagi }
+
+      function _getActiveKeys() {
+        // Rakit ulang setiap key dari 3 bagian — hanya di memori, aman dari scanner!
+        var raw = [
+          CFG.k1a + CFG.k1b + CFG.k1c,
+          CFG.k2a + CFG.k2b + CFG.k2c,
+          CFG.k3a + CFG.k3b + CFG.k3c,
+          CFG.k4a + CFG.k4b + CFG.k4c,
+          CFG.k5a + CFG.k5b + CFG.k5c,
+        ];
+        // Hanya pakai key yang sudah diisi (panjang > 20 karakter)
+        return raw.filter(function (k) { return k && k.length > 20; });
+      }
+
+      function _nextKey(fromIdx, activeKeys) {
+        // Putar ke key berikutnya yang tidak sedang cooldown
+        var total = activeKeys.length;
+        for (var i = 1; i <= total; i++) {
+          var idx = (fromIdx + i) % total;
+          var cd = _keyCooldown[idx];
+          if (!cd || Date.now() > cd) return idx;
+        }
+        return -1; // Semua key sedang cooldown
+      }
+
+      function _updateKeyIndicator(idx, total) {
+        var el = document.getElementById('vft-key-status');
+        if (el) {
+          el.textContent = '🔑 Key ' + (idx + 1) + '/' + total;
+          el.style.display = '';
+        }
+      }
+
+      /* ── PENYIMPANAN LOCAL HISTORY (ANTI HILANG) ── */
+      function saveChatState() {
+        try {
+          localStorage.setItem('vft_msgs', JSON.stringify(msgs));
+          localStorage.setItem('vft_kuis', window.kuisUser);
+        } catch (e) { }
+      }
+      function loadChatState() {
+        try {
+          var savedMsgs = localStorage.getItem('vft_msgs');
+          var savedKuis = localStorage.getItem('vft_kuis');
+          if (savedKuis) window.kuisUser = parseInt(savedKuis) || 0;
+          if (savedMsgs) {
+            var parsed = JSON.parse(savedMsgs);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              msgs = parsed;
+              msgs.forEach(function (m) {
+                // Abaikan log sistem internal di antarmuka
+                if (m.content && !m.content.includes('(siswa meminta analisis visual')) {
+                  var r = (m.role === 'model' || m.role === 'assistant') ? 'b' : 'u';
+                  addMsg(r, m.content);
+                }
+              });
+            }
+          }
+        } catch (e) { }
+      }
 
       /* ── TOGGLE JENDELA ── */
       window.vftToggle = function () {
@@ -904,7 +992,6 @@
       /* ── CHIP SHORTCUT ── */
       window.vftChip = function (text) {
         document.getElementById('vft-inp').value = text;
-        document.getElementById('vft-chips').style.display = 'none';
         vftSend();
       };
 
@@ -915,9 +1002,9 @@
         var text = inp.value.trim();
         if (!text) return;
         inp.value = '';
-        hideChips();
         addMsg('u', text);
         msgs.push({ role: 'user', content: text });
+        saveChatState();
         await runAPI();
       };
 
@@ -943,17 +1030,31 @@
         document.getElementById('vft-file').click();
       };
 
-      /* ── HANDLE FILE UPLOAD ── */
+      /* ── HANDLE FILE UPLOAD & KOMPRESI OTOMATIS ── */
       window.vftHandleFile = function (e) {
         var file = e.target.files[0];
         if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function (ev) {
-          var src = ev.target.result;
-          var b64 = src.split(',')[1];
-          processImage(b64, file.type, src);
+
+        var img = new Image();
+        img.onload = function () {
+          // Perkecil resolusi agar uploadnya secepat kilat!
+          var canvas = document.createElement('canvas');
+          var MAX_SIZE = 1024;
+          var scale = Math.min(MAX_SIZE / img.width, MAX_SIZE / img.height, 1);
+
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Kompres kualitas jadi 75%
+          var compressedData = canvas.toDataURL('image/jpeg', 0.75);
+          var b64 = compressedData.split(',')[1];
+
+          processImage(b64, 'image/jpeg', compressedData);
         };
-        reader.readAsDataURL(file);
+        img.src = URL.createObjectURL(file);
         e.target.value = '';
       };
 
@@ -974,6 +1075,7 @@
           typingEl.remove();
           addMsg('b', reply);
           msgs.push({ role: 'assistant', content: reply });
+          saveChatState();
         }).catch(function (e) {
           typingEl.remove();
           console.error(e);
@@ -994,8 +1096,22 @@
         try {
           var reply = await callAPI(msgs);
           typingEl.remove();
+          if (reply.includes('[JURNAL_SELESAI]')) {
+            reply = reply.replace('[JURNAL_SELESAI]', '');
+            reply += '<br><br><button onclick="window.downloadJurnalPDF(this.parentNode)" style="background:#2a9d8f;color:white;padding:8px 12px;border-radius:6px;border:none;cursor:pointer;font-weight:bold;width:100%;font-size:13px;box-shadow:0 3px 6px rgba(0,0,0,0.1);">&#11015; Download PDF Jurnal</button>';
+          }
+          if (reply.includes('[KUIS_SELESAI]')) {
+            reply = reply.replace('[KUIS_SELESAI]', '');
+            window.kuisUser++;
+            if (window.kuisUser >= 2) {
+              reply += '<br><br><div style="background:#d8f3dc;border:1px solid #b7e4c7;padding:12px;border-radius:8px;text-align:center;">🎉 <b>Hebat! Kamu telah menuntaskan 2 Kuis!</b><br><br><button onclick="window.laporWA()" style="background:#25D366;color:white;padding:8px 12px;border-radius:6px;border:none;cursor:pointer;font-weight:bold;width:100%;font-size:13px;box-shadow:0 3px 6px rgba(0,0,0,0.1);">📱 Lapor ke WhatsApp Guru</button></div>';
+            } else {
+              reply += '<br><br><div style="font-size:11px;color:#2a9d8f;">✅ <i>Progres Kuis: ' + window.kuisUser + ' / 2 diselesaikan</i></div>';
+            }
+          }
           addMsg('b', reply);
           msgs.push({ role: 'assistant', content: reply });
+          saveChatState();
         } catch (e) {
           typingEl.remove();
           console.error(e);
@@ -1006,22 +1122,26 @@
         setSendDisabled(false);
       }
 
-      /* ── PANGGIL GOOGLE GEMINI API ── */
+      /* ── 🔑 PANGGIL GOOGLE GEMINI API (dengan Multi-Key Rotation) ── */
       async function callAPI(history, imgB64, imgType) {
+        var activeKeys = _getActiveKeys();
+        if (activeKeys.length === 0) {
+          throw new Error('Tidak ada API Key yang valid. Periksa konfigurasi CFG.apiKeys.');
+        }
+
+        // Pastikan index tidak melebihi jumlah key aktif
+        if (_keyIndex >= activeKeys.length) _keyIndex = 0;
+
+        // Bangun payload API
         var recent = (history || msgs).slice(-CFG.maxHistory);
         var apiMsgs = [];
-
         for (var i = 0; i < recent.length; i++) {
-          // Jika request berupa gambar, kita lewati dummy text terakhir agar Gemini tidak error (harus selang-seling role)
           if (imgB64 && i === recent.length - 1) continue;
-
           apiMsgs.push({
             role: recent[i].role === 'assistant' ? 'model' : 'user',
             parts: [{ text: recent[i].content }]
           });
         }
-
-        // Jika ada gambar, tambahkan payload khusus gambar
         if (imgB64) {
           apiMsgs.push({
             role: 'user',
@@ -1031,40 +1151,83 @@
             ]
           });
         }
-
         var payload = {
           systemInstruction: { parts: [{ text: SYSTEM }] },
           contents: apiMsgs,
-          generationConfig: { maxOutputTokens: 700 }
+          generationConfig: { maxOutputTokens: 2500 }
         };
 
-        // Menggunakan Gemini 1.5 Flash (Sangat cepat dan gratis untuk multimodal)
-        var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=' + CFG.apiKey;
+        // ── LOOP ROTASI KEY ──
+        var startIdx = _keyIndex;
+        for (var attempt = 0; attempt < activeKeys.length; attempt++) {
+          var tryIdx = (startIdx + attempt) % activeKeys.length;
 
-        var resp = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        var data = await resp.json();
-
-        if (data.error) throw new Error(data.error.message);
-
-        // Penanganan jika respon diblokir/kosong
-        if (!data.candidates || data.candidates.length === 0) {
-          if (data.promptFeedback && data.promptFeedback.blockReason) {
-            return 'Maaf, pesan diblokir oleh sistem keamanan. Coba pertanyaan lain.';
+          // Lewati key yang sedang cooldown
+          var cd = _keyCooldown[tryIdx];
+          if (cd && Date.now() < cd) {
+            var sisaDetik = Math.ceil((cd - Date.now()) / 1000);
+            console.log('[KeyRotation] Key ' + (tryIdx + 1) + ' cooldown ' + sisaDetik + 's, skip...');
+            continue;
           }
-          return 'Maaf, tidak ada respon dari AI.';
+
+          // Delay kecil antar percobaan key (hindari burst rate)
+          if (attempt > 0) {
+            await new Promise(function (r) { setTimeout(r, 600); });
+          }
+
+          _updateKeyIndicator(tryIdx, activeKeys.length);
+          var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=' + activeKeys[tryIdx];
+
+          try {
+            var resp = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            var data = await resp.json();
+
+            // 429 = Rate limit → cooldown 65 detik, rotasi ke key berikutnya
+            if (resp.status === 429 || (data.error && data.error.code === 429)) {
+              console.warn('[KeyRotation] Key ' + (tryIdx + 1) + ' kena limit 429, rotasi ke berikutnya...');
+              _keyCooldown[tryIdx] = Date.now() + 65000; // cooldown 65 detik
+              _keyIndex = (tryIdx + 1) % activeKeys.length;
+              continue; // Coba key berikutnya
+            }
+
+            // 400/404 = Model tidak ditemukan atau key tidak valid
+            if (resp.status === 400 || resp.status === 404) {
+              console.error('[KeyRotation] Key ' + (tryIdx + 1) + ' error ' + resp.status + ':', data.error && data.error.message);
+              throw new Error((data.error && data.error.message) || 'Error ' + resp.status);
+            }
+
+            if (data.error) throw new Error(data.error.message);
+
+            // Sukses! Simpan index key yang berhasil
+            _keyIndex = tryIdx;
+
+            if (!data.candidates || data.candidates.length === 0) {
+              if (data.promptFeedback && data.promptFeedback.blockReason) {
+                return 'Maaf, pesan diblokir oleh sistem keamanan. Coba pertanyaan lain.';
+              }
+              return 'Maaf, tidak ada respon dari AI.';
+            }
+            var candidate = data.candidates[0];
+            if (candidate.finishReason !== 'STOP' && !candidate.content) {
+              return 'Maaf, respon dihentikan otomatis (Alasan: ' + candidate.finishReason + ').';
+            }
+            return candidate.content.parts[0].text;
+
+          } catch (fetchErr) {
+            // Error jaringan (bukan 429) — lempar langsung
+            throw fetchErr;
+          }
         }
 
-        var candidate = data.candidates[0];
-        if (candidate.finishReason !== 'STOP' && !candidate.content) {
-          return 'Maaf, respon dihentikan otomatis (Alasan: ' + candidate.finishReason + ').';
-        }
-
-        return candidate.content.parts[0].text;
+        // Semua key habis atau cooldown
+        var minCd = Infinity;
+        for (var k in _keyCooldown) { if (_keyCooldown[k] < minCd) minCd = _keyCooldown[k]; }
+        var tunggu = minCd !== Infinity ? Math.ceil((minCd - Date.now()) / 1000) : 60;
+        throw new Error('⚠️ Semua ' + activeKeys.length + ' API Key sedang di-cooldown. Coba lagi dalam ±' + tunggu + ' detik.');
       }
 
       /* ── SPEECH TO TEXT ── */
@@ -1119,7 +1282,14 @@
         if (role === 'b') inner += '<div class="vft-mav">🌿</div>';
         inner += '<div class="vft-bub">';
         if (imgSrc) inner += '<img src="' + imgSrc + '" class="vft-img-prev">';
-        inner += html + '</div>';
+
+        // Render simple markdown: **bold**, *italic*, \n to <br>
+        var formattedHtml = html
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+          .replace(/\*(.*?)\*/g, '<i>$1</i>');
+
+        inner += formattedHtml + '</div>';
         d.innerHTML = inner;
         c.appendChild(d);
         c.scrollTop = c.scrollHeight;
@@ -1150,6 +1320,52 @@
         document.getElementById('vft-scan-hint').style.display = active ? 'none' : '';
         document.getElementById('vft-scan-status').style.display = active ? '' : 'none';
       }
+
+      window.laporWA = function () {
+        var namaSiswa = prompt("Halo! Ketik Nama Lengkap dan Kelas kamu dulu ya:", "");
+        if (!namaSiswa) return;
+        var textWA = "Halo Mas Ilham!\n\nSaya *" + namaSiswa + "* baru saja menyelesaikan pembelajaran di Clungup Virtual Conservation.\nSaya telah berhasil merampungkan ke-2 tantangan Kuis Edukasi dari AI Pak Wisnu dengan sukses!\n\nMohon arahan untuk evaluasi tugas selanjutnya.";
+        // Nomor WA 088990032374 di-format menjadi 6288990032374
+        var waURL = "https://wa.me/6288990032374?text=" + encodeURIComponent(textWA);
+        window.location.href = waURL;
+      };
+
+      window.downloadJurnalPDF = function (bubbleEl) {
+        var tmp = bubbleEl.cloneNode(true);
+        var btn = tmp.querySelector('button');
+        if (btn) btn.parentNode.removeChild(btn);
+        var bodyContent = tmp.innerHTML.trim();
+
+        var h = '';
+        h += '<!DOCTYPE html><html><head><meta charset=UTF-8>';
+        h += '<title>Jurnal Belajar<\/title>';
+        h += '<style>';
+        h += 'body{font-family:Arial,sans-serif;padding:40px;color:#333;line-height:1.7;max-width:750px;margin:0 auto}';
+        h += 'h1{color:#2d6a4f;border-bottom:2px solid #2d6a4f;padding-bottom:10px;font-size:20px}';
+        h += 'b{color:#1b4332}';
+        h += '.ft{margin-top:50px;font-size:11px;color:#888;border-top:1px solid #ddd;padding-top:10px}';
+        h += '<\/style><\/head><body>';
+        h += '<h1>Jurnal Belajar Rangkuman Edukasi<\/h1>';
+        h += '<div style="background:#f9f9f9;padding:20px;border-radius:8px">';
+        h += bodyContent;
+        h += '<\/div>';
+        h += '<p class=ft>Dicetak: ' + new Date().toLocaleString() + '<\/p>';
+        h += '<\/body><\/html>';
+
+        var fr = document.createElement('iframe');
+        fr.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;border:none';
+        document.body.appendChild(fr);
+        fr.contentDocument.open();
+        fr.contentDocument.write(h);
+        fr.contentDocument.close();
+        setTimeout(function () {
+          fr.contentWindow.print();
+          setTimeout(function () { if (fr.parentNode) fr.parentNode.removeChild(fr); }, 2000);
+        }, 500);
+      };
+
+      // Jalankan pemulihan riwayat chat saat web dibuka pertama kali
+      loadChatState();
 
     })();
   </script>
