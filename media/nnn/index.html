@@ -1433,6 +1433,7 @@ loadTour()
     </div>
 
     <!-- LOGIKA JAVASCRIPT WIDGET AI -->
+    <script src="config.js"></script>
     <script>
       // =========================================================================
       // KUNCI API GEMINI
@@ -1440,9 +1441,9 @@ loadTour()
       // Isi dengan API Key Anda (contoh: "AIzaSy...") JIKA Anda mengetesnya di
       // komputer Anda (Live Server) atau Hosting Anda sendiri.
       // =========================================================================
-      const apiKey = "AIzaSyC5cOnG8KrTujZS9lkIYvBudxZL6T6la1c";
-
+   
       document.addEventListener("DOMContentLoaded", function () {
+        const apiKey = atob(k);
         const chatFab = document.getElementById("gt-chat-fab");
         const chatPanel = document.getElementById("gt-chat-panel");
         const closeBtn = document.getElementById("gt-close-chat");
@@ -1463,11 +1464,21 @@ loadTour()
         let currentMimeType = null;
 
         // Instruksi Sistem untuk membentuk persona AI
-        const systemPrompt = `Anda adalah asisten pemandu virtual resmi bernama "GeoVentura AI" untuk proyek Media Pembelajaran Virtual Field Trip. 
-            Tugas Anda adalah memandu pengunjung yang sedang melihat panorama 360 derajat terkait pemanfaatan sumber daya alam di Jawa Timur.
-            Wilayah yang dikaji pada Virtual Field Trip ini meliputi Desa Toyomarto Singosari, Desa Sekapuk Gresik, TNBTS, dan GeoPark Ijen.
-            Anda dapat melihat gambar yang diunggah pengunjung dan menganalisisnya, terutama jika terkait dengan SDA, batuan, geologi, atau lingkungan pada wilayah kajian.
-            Bersikaplah ramah, akademis namun mudah dipahami, dan berikan penjelasan mendalam mengenai aspek geologi, lingkungan, atau pertanyaan relevan lainnya.
+        const systemPrompt = `Anda adalah asisten ahli Geografi dan instruktur Virtual Field Trip resmi bernama "GeoVentura AI Assistant" untuk proyek Media Pembelajaran Virtual Field Trip Geoventura. 
+            Misi utama Anda adalah meningkatkan Kemampuan Berpikir Spasial (Spatial Thinking) mahasiswa melalui analisis fenomena geosfer dan pemanfaatan SDA di Jawa Timur (Desa Toyomarto, Desa Sekapuk, Bromo, dan Geopark Ijen).
+            Wilayah yang dikaji pada Virtual Field Trip ini meliputi Desa Toyomarto Singosari, Desa Sekapuk Gresik, Taman Nasional Bromo Tengger Semeru, dan GeoPark Ijen yang meliputi Kawah Wurung, Kalipait, dan Kawah Ijen.
+            Pada wilayah Desa Toyomarto Singosari kita akan fokus mempelajari pemanfaatan sumber daya alam berupa tambang batu yang berlokasi di desa tersebut.
+            Pada wilayah Desa Sekapuk kita akan fokus mempelajari pemanfaatan sumber daya alam berupa tambang batu kapur dan pemanfaatan kawasan bekas tambang batu kapur.
+            Pada wilayah Taman Nasional Bromo Tengger Semeru kita akan fokus mempelajari pemanfaatan sumber daya alam di sana berupa perkebunan, potensi wisata, dan potensi SDA lainnya.
+            Pada wilayah GeoPark Ijen kita akan menjelajahi kawah wurung dimana kita akan fokus mempelajari pemanfaatan sumber daya alam panas bumi disana, kalipait dimana kita akan mempelajari mengenai potensi belerang disana, dan kawah ijen dimana kita akan mempelajari mengenai potensi sumber daya alam berupa belerang dan pemanfaatan kawah sebagai tempat wisata.
+            Anda dapat melihat gambar yang diunggah pengunjung dan menganalisisnya, terutama terkait dengan pemanfaatan SDA, batuan, geologi, atau lingkungan pada wilayah kajian.
+            Ada beberapa aturan wajib yang harus dipatuhi seperti:
+            1. Kepatuhan Lokasi (MUTLAK): Selalu gunakan tag [KONTEKS SISTEM: ...] sebagai pijakan utama ruang observasi. Bertindaklah seolah Anda dan mahasiswa sedang melakukan observasi langsung di titik koordinat/panorama tersebut.
+            2. Integrasi Konsep Spasial: Dalam setiap penjelasan, Anda harus memasukkan minimal satu elemen Berpikir Spasial berikut: Asosiasi Keruangan: Jelaskan hubungan sebab-akibat antar fenomena di lokasi tersebut, Interaksi Keruangan: Jelaskan bagaimana lokasi tersebut memengaruhi atau dipengaruhi wilayah lain, Perubahan Keruangan (Waktu & Ruang): Jelaskan evolusi ruang.
+            3. Pertanyaan Pemicu Spasial (Socratic Method): JANGAN akhiri respons dengan kesimpulan tertutup. Anda WAJIB mengakhiri setiap jawaban dengan satu pertanyaan analitis yang membuat mahasiswa mengamati keadaan sekitar di VFT atau memikirkan pola keruangan.
+            4. Analisis Visual Keruangan: Jika mahasiswa mengunggah gambar, jangan sekadar mengidentifikasi objek. Analisis letak, pola persebaran, skala objek, dan konteks keruangannya terhadap lingkungan sekitar.
+            Bersikaplah ramah, akademis namun mudah dipahami, dan berikan penjelasan mendalam mengenai aspek geografi, geologi, lingkungan, atau pertanyaan relevan lainnya.
+            Gunakan bahasa akademis Geografi yang baku namun komunikatif. Format jawaban harus ringkas (maksimal 3 paragraf), gunakan huruf tebal untuk istilah penting dan gunakan poin-poin agar nyaman dibaca di widget chat VFT. Tolak pertanyaan di luar konteks Geografi dengan sopan.
             Jawablah dalam bahasa Indonesia disertai dengan rujukannya. Format teks Anda dengan Markdown dasar (seperti **tebal** untuk penekanan) agar mudah dibaca.
             Jaga agar jawaban Anda informatif namun tidak terlalu panjang agar nyaman dibaca di widget chat kecil.`;
 
@@ -1654,7 +1665,7 @@ loadTour()
 
         // --- FUNGSI TEXT TO SPEECH API GEMINI ---
         async function fetchTTS(text) {
-          const modelName = "gemini-2.0-flash";
+          const modelName = "gemini-flash-latest";
           const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey}`;
 
           const payload = {
@@ -1737,7 +1748,7 @@ loadTour()
 
       // --- FUNGSI GENERATE CONTENT (TEXT & IMAGE) ---
         async function fetchGeminiResponse(userText, base64Img, mimeType) {
-          const modelName = "gemini-1.5-flash-latest";
+          const modelName = "gemini-flash-latest";
           
           // Menggunakan v1 versi beta
           const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
@@ -1750,68 +1761,59 @@ loadTour()
 // --- LOGIKA PEMBERSIHAN BASE64 ---
   // Kita definisikan variabelnya di sini agar bisa digunakan di bawah
   const cleanBase64 = base64Img ? (base64Img.split(",")[1] || base64Img) : null;
-          let partsArray = [
-            {
-              text: `Konteks Percakapan Sebelumnya:\n${recentHistoryText}\n\nPesan Pengguna Saat Ini: ${userText}`,
-            },
-          ];
+          let promptUtama = `[INSTRUKSI SISTEM: ${systemPrompt}]\n\n` +
+                    `[KONTEKS PERCAKAPAN]:\n${recentHistoryText}\n\n` +
+                    `[PESAN PENGGUNA]: ${userText}`;
 
-          if (cleanBase64 && mimeType) {
-            partsArray.push({
-              inline_data: {
-                mime_type: mimeType,
-                data: cleanBase64, // Gunakan yang sudah dibersihkan
-              },
-            });
-          }
+  let partsArray = [{ text: promptUtama }];
 
-          // PERBAIKAN: Menambahkan role "user"
-          const payload = {
-            contents: [
-              {
-                role: "user", // <-- INI SANGAT PENTING
-                parts: partsArray,
-              },
-            ],
-            system_instruction: {
-              parts: [{ text: systemPrompt }],
-            },
-          };
+  if (cleanBase64 && mimeType) {
+    partsArray.push({
+      inline_data: {          // Wajib Snakecase
+        mime_type: mimeType,  // Wajib Snakecase
+        data: cleanBase64, 
+      },
+    });
+  }
 
-          const delays = [1000, 2000, 4000, 8000, 16000];
+  const payload = {
+    contents: [
+      {
+        role: "user",
+        parts: partsArray,
+      },
+    ],
+    // systemInstruction kita hapus dari sini karena v1 sering tidak mengenalnya
+  };
 
-          for (let i = 0; i <= delays.length; i++) {
-            try {
-              const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-              });
+  const delays = [2000, 5000, 10000];
 
-              if (!response.ok) {
-                // Trik Debugging: Mengambil pesan error asli dari Google
-                const errData = await response.json();
-                console.error("Detail Error API:", errData);
-                throw new Error(`HTTP error! status: ${response.status}`);
-              }
+  for (let i = 0; i < delays.length; i++) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-              const result = await response.json();
-              const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!response.ok) {
+        const errData = await response.json();
+        console.error("Detail Error API:", errData);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-              if (aiReply) {
-                return aiReply;
-              } else {
-                throw new Error("Format balasan API tidak terduga");
-              }
-            } catch (error) {
-              if (i === delays.length) {
-                return "Maaf, koneksi ke server AI saat ini sedang tidak stabil. Pastikan API key Anda valid jika diuji di luar platform ini.";
-              }
-              await new Promise((resolve) => setTimeout(resolve, delays[i]));
-            }
-          }
-        }
+      const result = await response.json();
+      const aiReply = result.candidates?.[0]?.content?.parts?.[0]?.text;
 
+      if (aiReply) return aiReply;
+      else throw new Error("Format balasan API tidak terduga");
+
+    } catch (error) {
+      if (i === delays.length - 1) return "Maaf, server AI sedang sibuk. Coba lagi sebentar ya!";
+      await new Promise((resolve) => setTimeout(resolve, delays[i]));
+    }
+  }
+}
         // Aksi cepat
         window.sendQuickAction = async function (text) {
           chatInput.value = text;
