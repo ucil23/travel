@@ -52,7 +52,7 @@ const data = [
     id: 7,
     title: "GeoVentura",
     title2: "Natural Resource",
-    slug: "/media/nnn",
+    slug: "/media/GeoVentura_Virtual",
     image: "/assets/images/sampulbaru.png",
     location: "Malang, Gresik, Bondowoso, Jawa Timur",
   },
