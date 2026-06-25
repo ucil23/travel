@@ -605,8 +605,7 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // PERHATIAN: Pastikan file config.js sudah mendefinisikan variabel 'k'
-        const apiKey = typeof k !== 'undefined' ? atob(k) : ''; 
-        
+        const apiKey = atob(k); 
         const chatFab = document.getElementById("gt-chat-fab");
         const chatPanel = document.getElementById("gt-chat-panel");
         const closeBtn = document.getElementById("gt-close-chat");
