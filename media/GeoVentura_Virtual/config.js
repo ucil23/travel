@@ -1,2 +1,2 @@
 // File: media/nnn/config.js
-const k = "QUl6YVN5REhfRGtpYnJybnFfSzdwYzhZLWhqaXVnaFg5XzgwekNV";
+const k = "AIzaSyDH_Dkibrrnq_K7pc8Y-hjiughX9_80zCU";
