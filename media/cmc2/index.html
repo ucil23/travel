@@ -833,6 +833,79 @@
       height: 14px
     }
 
+    /* ── QUIZ UI ── */
+    .vft-quiz-container {
+      background: #ffffff;
+      border: 1px solid #c8e6c9;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .vft-quiz-q {
+      font-weight: 700;
+      color: #1b4332;
+      margin-bottom: 10px;
+      font-size: 13.5px;
+      line-height: 1.4;
+    }
+    .vft-quiz-btn {
+      display: block;
+      width: 100%;
+      background: #f0faf4;
+      border: 1px solid #b7e4c7;
+      color: #2d6a4f;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 8px;
+      text-align: left;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all .2s;
+    }
+    .vft-quiz-btn:hover:not(:disabled) {
+      background: #d8f3dc;
+      border-color: #95d5b2;
+    }
+    .vft-quiz-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+    .vft-quiz-btn.correct {
+      background: #d4edda !important;
+      border-color: #c3e6cb !important;
+      color: #155724 !important;
+      font-weight: bold;
+    }
+    .vft-quiz-btn.wrong {
+      background: #f8d7da !important;
+      border-color: #f5c6cb !important;
+      color: #721c24 !important;
+    }
+    .vft-quiz-expl {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #374151;
+      padding-top: 8px;
+      border-top: 1px dashed #c8e6c9;
+      line-height: 1.5;
+    }
+    .vft-quiz-wa-btn {
+      background: #25D366;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      font-size: 13px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      margin-top: 8px;
+      font-family: 'Nunito', sans-serif;
+    }
+
     /* ── MOBILE ── */
     @media(max-width:400px) {
       #vft-win {
@@ -948,7 +1021,7 @@
         + ' PENTING: Selalu kaitkan penjelasanmu dengan teori lingkungan hidup seperti Carrying Capacity (Daya Dukung), Ecological Footprint (Jejak Ekologis), Blue Carbon, Pendekatan Keruangan/Ekologis, dan Community Based Conservation, dan sebagainya yang relevan dengan pertanyaan.'
         + ' Gunakan bahasa Indonesia yang edukatif namun tetap asyik. Jawaban idealnya 3-7 kalimat, sesekali pakai emoji relevan.'
         + ' Jika menerima gambar, identifikasi semua objek yang terlihat, jelaskan nama, fungsi, fakta menarik, dan nilai edukasinya secara saintifik.'
-        + ' JIKA PENGGUNA MEMINTA KUIS ATAU UJIAN: Berikan persis 1 pertanyaan pilihan ganda yang mendidik (A, B, C) tentang konservasi ekosistem. Tunggu mereka menebak/menjawab. Setelah dijawab, berikan penilaian super antusias, pujian, lalu jelaskan rahasia jawabannya! PENTING: Di baris terakhir balasan penilaimu terhadap kuis tersebut WAJIB tambahkan persis kode ini: [KUIS_SELESAI]'
+        + ' JIKA PENGGUNA MEMINTA KUIS ATAU UJIAN: Kamu WAJIB menyisipkan data kuis dalam format JSON yang diapit oleh tag <KUIS> dan </KUIS>. JSON harus memiliki properti: "pertanyaan" (string), "opsi" (array of 3 string), "jawaban_benar" (integer index 0-2), dan "penjelasan" (string kenapa benar). Contoh: <KUIS>{"pertanyaan": "Berapa...", "opsi": ["Satu", "Dua", "Tiga"], "jawaban_benar": 1, "penjelasan": "Karena..."}</KUIS>. Kamu boleh memberi kata pengantar sebelum tag <KUIS>.'
         + ' JIKA PENGGUNA MEMINTA JURNAL RANGKUMAN: Rangkum seluruh poin materi akademik yang telah diobrolkan dari awal, beri tingkat penilaian keaktifan penggunanya, dan motivasi manis. PENTING: Di akhir respon jurnalmu WAJIB tambahkan persis kata ini: [JURNAL_SELESAI]';
 
       var msgs = [], loading = false, chatOpen = false;
@@ -1126,7 +1199,7 @@
         });
       }
 
-      /* ── JALANKAN API (TEKS) ── */
+            /* ── JALANKAN API (TEKS) ── */
       async function runAPI() {
         loading = true;
         setSendDisabled(true);
@@ -1134,26 +1207,64 @@
         try {
           var reply = await callAPI(msgs);
           typingEl.remove();
+          
           if (reply.includes('[JURNAL_SELESAI]')) {
             reply = reply.replace('[JURNAL_SELESAI]', '');
             reply += '<br><br><button onclick="window.downloadJurnalPDF(this.parentNode)" style="background:#2a9d8f;color:white;padding:8px 12px;border-radius:6px;border:none;cursor:pointer;font-weight:bold;width:100%;font-size:13px;box-shadow:0 3px 6px rgba(0,0,0,0.1);">&#11015; Download PDF Jurnal</button>';
           }
-          if (reply.includes('[KUIS_SELESAI]')) {
-            reply = reply.replace('[KUIS_SELESAI]', '');
-            window.kuisUser++;
-            if (window.kuisUser >= 2) {
-              reply += '<br><br><div style="background:#d8f3dc;border:1px solid #b7e4c7;padding:12px;border-radius:8px;text-align:center;">🎉 <b>Hebat! Kamu telah menuntaskan 2 Kuis!</b><br><br><button onclick="window.laporWA()" style="background:#25D366;color:white;padding:8px 12px;border-radius:6px;border:none;cursor:pointer;font-weight:bold;width:100%;font-size:13px;box-shadow:0 3px 6px rgba(0,0,0,0.1);">📱 Lapor ke WhatsApp Guru</button></div>';
+
+          var kuisHtml = '';
+          var jsonStr = null;
+          
+          var kuisMatch = reply.match(/<KUIS>([\s\S]*?)<\/KUIS>/);
+          if (kuisMatch) {
+            jsonStr = kuisMatch[1];
+            reply = reply.replace(kuisMatch[0], '').trim();
+          } else {
+            var jsonMatch = reply.match(/```(?:json)?\s*(\{[\s\S]*?"jawaban_benar"[\s\S]*?\})\s*```/);
+            if (jsonMatch) {
+              jsonStr = jsonMatch[1];
+              reply = reply.replace(jsonMatch[0], '').trim();
             } else {
-              reply += '<br><br><div style="font-size:11px;color:#2a9d8f;">✅ <i>Progres Kuis: ' + window.kuisUser + ' / 2 diselesaikan</i></div>';
+              var rawMatch = reply.match(/(\{[\s\S]*?"jawaban_benar"[\s\S]*?\})/);
+              if (rawMatch) {
+                jsonStr = rawMatch[1];
+                reply = reply.replace(rawMatch[0], '').trim();
+              }
             }
           }
+
+          if (jsonStr) {
+            jsonStr = jsonStr.replace(/```(?:json)?/g, '').replace(/```/g, '').trim();
+            try {
+              var kuisData = JSON.parse(jsonStr);
+              var qId = 'kuis_' + Date.now();
+              window['data_' + qId] = kuisData;
+              kuisHtml = '<div class="vft-quiz-container" id="' + qId + '">';
+              kuisHtml += '<div class="vft-quiz-q">' + kuisData.pertanyaan + '</div>';
+              kuisData.opsi.forEach(function(opt, idx) {
+                var btnHtml = '<button class="vft-quiz-btn" onclick="window.jawabKuis(\'' + qId + '\', ' + idx + ')">';
+                btnHtml += String.fromCharCode(65 + idx) + '. ' + opt + '</button>';
+                kuisHtml += btnHtml;
+              });
+              kuisHtml += '<div class="vft-quiz-expl" id="expl_' + qId + '" style="display:none"></div>';
+              kuisHtml += '</div>';
+            } catch (e) {
+              console.error("Gagal parse KUIS", e);
+            }
+          }
+
+          if (kuisHtml) {
+            reply += (reply.length > 0 ? '<br>' : '') + kuisHtml;
+          }
+          
           addMsg('b', reply);
           msgs.push({ role: 'assistant', content: reply });
           saveChatState();
         } catch (e) {
           typingEl.remove();
           console.error(e);
-          addMsg('b', 'Maaf, ada gangguan koneksi. Coba lagi ya! 🙏');
+          addMsg('b', 'Maaf, API Error: ' + (e.message || e));
           msgs.pop();
         }
         loading = false;
@@ -1214,7 +1325,7 @@
           }
 
           _updateKeyIndicator(tryIdx, activeKeys.length);
-          var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=' + activeKeys[tryIdx];
+          var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=' + activeKeys[tryIdx];
 
           try {
             var resp = await fetch(url, {
@@ -1308,6 +1419,39 @@
         document.getElementById('vft-mic').classList.remove('active');
         document.getElementById('vft-inp').placeholder = 'Tanya Pak Wisnu...';
       }
+
+      /* ── LOGIKA JAWAB KUIS UI ── */
+      window.jawabKuis = function(qId, selectedIdx) {
+        var data = window['data_' + qId];
+        var container = document.getElementById(qId);
+        if (!container || !data) return;
+        
+        var btns = container.querySelectorAll('.vft-quiz-btn');
+        btns.forEach(function(b, idx) {
+          b.disabled = true;
+          if (idx === data.jawaban_benar) {
+            b.classList.add('correct');
+          } else if (idx === selectedIdx) {
+            b.classList.add('wrong');
+          }
+        });
+        
+        var expl = document.getElementById('expl_' + qId);
+        expl.style.display = 'block';
+        
+        var isCorrect = selectedIdx === data.jawaban_benar;
+        expl.innerHTML = (isCorrect ? '🎉 <b>Benar!</b> ' : '❌ <b>Kurang tepat.</b> ') + data.penjelasan;
+        
+        if (isCorrect) {
+          window.kuisUser++;
+          if (window.kuisUser >= 2) {
+            expl.innerHTML += '<br><div style="background:#d8f3dc;border:1px solid #b7e4c7;padding:12px;border-radius:8px;text-align:center;margin-top:10px;">🎉 <b>Hebat! Kamu telah menuntaskan 2 Kuis!</b><button onclick="window.laporWA()" class="vft-quiz-wa-btn">📱 Lapor ke WhatsApp Guru</button></div>';
+          } else {
+            expl.innerHTML += '<div style="font-size:11px;color:#2a9d8f;margin-top:6px;">✅ <i>Progres Kuis: ' + window.kuisUser + ' / 2 diselesaikan</i></div>';
+          }
+          saveChatState();
+        }
+      };
 
       /* ── HELPERS UI ── */
       var typingCounter = 0;
