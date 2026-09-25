@@ -56,6 +56,14 @@ const data = [
     image: "/assets/images/sampulbaru.png",
     location: "Malang, Gresik, Bondowoso, Jawa Timur",
   },
+  {
+    id: 8,
+    title: "Nadah Banyu",
+    title2: "Tradisi Koncservasi Air",
+    slug: "/media/NadahBanyu",
+    image: "/assets/images/NadahBanyu.jpeg",
+    location: "Songgoriti, Jawa Timur",
+    },
 ];
 
 // ambil element berdasarkan id ="cards"
