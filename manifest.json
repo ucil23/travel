@@ -1,0 +1,21 @@
+{
+  "name": "GEO TALK MEDIA",
+  "short_name": "GeoTalk",
+  "description": "GEOTALKMEDIA merupakan media pembelajaran virtual field trip untuk menunjang pembelajaran terkait sumber daya alam dan lingkungan.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/assets/geotalk.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/geotalk.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
