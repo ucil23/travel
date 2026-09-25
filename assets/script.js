@@ -63,7 +63,7 @@ const data = [
     slug: "/media/NadahBanyu",
     image: "/assets/images/NadahBanyu.jpeg",
     location: "Songgoriti, Jawa Timur",
-    },
+  },
 ];
 
 // ambil element berdasarkan id ="cards"
