@@ -438,9 +438,697 @@
   }
   .pull-quote cite { display: block; font-size: 12px; font-style: normal; color: var(--sage); margin-top: 8px; font-family: 'DM Sans', sans-serif; }
 
-  /* wide screen */
-  @media (min-width: 1024px) {
-    .concept-grid { grid-template-columns: repeat(3, 1fr); }
+  /* ═══ INTERACTIVE QUIZ (BAB 07) ═══ */
+  .quiz-dashboard {
+    background: linear-gradient(135deg, rgba(26,58,40,0.95), rgba(10,26,18,0.98));
+    border: 1px solid rgba(126,201,154,0.3);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    color: var(--cream);
+    box-shadow: 0 10px 30px rgba(10,26,18,0.25);
+  }
+  .quiz-dash-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .quiz-dash-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--foam);
+  }
+  .quiz-dash-stats {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+  .quiz-stat-pill {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(126,201,154,0.25);
+    padding: 6px 14px;
+    border-radius: 100px;
+    color: var(--mint);
+  }
+  .quiz-stat-pill strong {
+    color: #fff;
+  }
+  .quiz-progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .quiz-progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--mint), var(--sky));
+    border-radius: 10px;
+    transition: width 0.35s ease;
+  }
+  .quiz-dash-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+  }
+  .quiz-dash-actions .subtext {
+    color: rgba(181,226,204,0.7);
+  }
+  .quiz-btn-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .quiz-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(126,201,154,0.15);
+    border: 1px solid rgba(126,201,154,0.35);
+    color: var(--foam);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 7px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quiz-btn:hover {
+    background: var(--leaf);
+    border-color: var(--sage);
+    color: white;
+  }
+  .quiz-btn.secondary {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.85);
+  }
+  .quiz-btn.secondary:hover {
+    background: rgba(255,255,255,0.15);
+    color: white;
+  }
+
+  .quiz-card {
+    background: white;
+    border: 1px solid var(--foam);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .quiz-card:hover {
+    box-shadow: 0 8px 24px rgba(45,90,64,0.08);
+  }
+  .quiz-card-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: var(--sky);
+    transition: background 0.3s;
+  }
+  .quiz-card.answered-correct .quiz-card-bar {
+    background: var(--leaf);
+  }
+  .quiz-card.answered-wrong .quiz-card-bar {
+    background: var(--red);
+  }
+  .quiz-q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .quiz-q-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .quiz-q-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.05);
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .quiz-q-status.correct {
+    background: var(--leaf);
+    color: white;
+  }
+  .quiz-q-status.wrong {
+    background: var(--red);
+    color: white;
+  }
+  .quiz-q-text {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    line-height: 1.65;
+    margin-bottom: 16px;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 18px;
+  }
+  .quiz-opt-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    background: #fff;
+    border: 1.5px solid rgba(90,158,117,0.22);
+    border-radius: 10px;
+    padding: 12px 16px;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    line-height: 1.5;
+  }
+  .quiz-opt-btn:hover:not(:disabled) {
+    background: rgba(126,201,154,0.08);
+    border-color: var(--leaf);
+    transform: translateX(4px);
+  }
+  .quiz-opt-btn .opt-badge {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.05);
+    color: var(--forest);
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .quiz-opt-btn .opt-text {
+    flex: 1;
+  }
+  .quiz-opt-btn .opt-icon {
+    font-size: 15px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  /* Option states */
+  .quiz-opt-btn.is-correct {
+    background: rgba(61,122,85,0.12);
+    border-color: var(--leaf);
+    color: var(--forest);
+    font-weight: 600;
+  }
+  .quiz-opt-btn.is-correct .opt-badge {
+    background: var(--leaf);
+    color: white;
+  }
+  .quiz-opt-btn.is-correct .opt-icon {
+    opacity: 1;
+  }
+
+  .quiz-opt-btn.is-wrong {
+    background: rgba(196,74,58,0.1);
+    border-color: var(--red);
+    color: var(--red);
+  }
+  .quiz-opt-btn.is-wrong .opt-badge {
+    background: var(--red);
+    color: white;
+  }
+  .quiz-opt-btn.is-wrong .opt-icon {
+    opacity: 1;
+  }
+
+  .quiz-opt-btn.is-revealed-correct {
+    border-color: var(--leaf);
+    background: rgba(61,122,85,0.07);
+    color: var(--forest);
+    border-style: dashed;
+    font-weight: 600;
+  }
+  .quiz-opt-btn.is-revealed-correct .opt-badge {
+    background: var(--leaf);
+    color: white;
+  }
+  .quiz-opt-btn.is-revealed-correct .opt-icon {
+    opacity: 1;
+  }
+
+  .quiz-opt-btn:disabled {
+    cursor: default;
+  }
+
+  /* Explanation box */
+  .quiz-explanation {
+    display: none;
+    background: rgba(61,122,85,0.07);
+    border-radius: 12px;
+    padding: 18px 20px;
+    border: 1px solid rgba(90,158,117,0.25);
+    animation: fadeInQuiz 0.35s ease both;
+  }
+  @keyframes fadeInQuiz {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .quiz-explanation.show {
+    display: block;
+  }
+  .quiz-exp-header {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--forest);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quiz-exp-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.65;
+    margin-bottom: 12px;
+  }
+  .quiz-exp-wrong-title {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .quiz-exp-wrong-list {
+    font-size: 12px;
+    color: var(--muted);
+    padding-left: 18px;
+    line-height: 1.6;
+  }
+
+  /* Scorecard Summary */
+  .quiz-summary-card {
+    display: none;
+    background: linear-gradient(135deg, #0a1a12, #143322);
+    border: 2px solid var(--mint);
+    border-radius: 18px;
+    padding: 32px;
+    color: var(--cream);
+    margin-bottom: 36px;
+    box-shadow: 0 16px 40px rgba(10,26,18,0.4);
+    animation: fadeInQuiz 0.5s ease both;
+  }
+  .quiz-summary-card.show {
+    display: block;
+  }
+  .quiz-summary-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+  @media (max-width: 680px) {
+    .quiz-summary-grid { grid-template-columns: 1fr; text-align: center; }
+  }
+  .quiz-score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(126,201,154,0.2), rgba(61,122,85,0.4));
+    border: 3px solid var(--mint);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 25px rgba(126,201,154,0.3);
+  }
+  .quiz-score-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+  .quiz-score-max {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--mint);
+  }
+  .quiz-badge-award {
+    display: inline-block;
+    background: rgba(232,160,64,0.2);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+  }
+  .quiz-summary-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .quiz-summary-desc {
+    font-size: 13.5px;
+    color: rgba(200,240,220,0.85);
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+  .quiz-summary-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .quiz-break-pill {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+
+  /* ═══ GLOSARIUM INTERAKTIF ═══ */
+  .glossary-wrapper {
+    margin-top: 10px;
+  }
+  .glossary-controls {
+    background: white;
+    border: 1px solid var(--foam);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(45,90,64,0.06);
+    margin-bottom: 28px;
+  }
+  .glossary-search-box {
+    position: relative;
+    margin-bottom: 18px;
+  }
+  .glossary-search-box input {
+    width: 100%;
+    padding: 14px 44px 14px 44px;
+    font-size: 14.5px;
+    border-radius: 12px;
+    border: 1.5px solid var(--foam);
+    background: var(--cream);
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    transition: all 0.2s ease;
+  }
+  .glossary-search-box input:focus {
+    border-color: var(--leaf);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(61,122,85,0.12);
+  }
+  .glossary-search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 17px;
+    color: var(--sage);
+    pointer-events: none;
+  }
+  .glossary-clear-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--muted);
+    padding: 4px 8px;
+    display: none;
+    border-radius: 4px;
+  }
+  .glossary-clear-btn:hover { color: var(--red); background: rgba(196,74,58,0.1); }
+  
+  .glossary-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .glossary-cat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .glossary-chip {
+    background: var(--cream);
+    border: 1px solid var(--foam);
+    color: var(--forest);
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .glossary-chip:hover {
+    background: rgba(90,158,117,0.15);
+    border-color: var(--sage);
+  }
+  .glossary-chip.active {
+    background: var(--forest);
+    color: white;
+    border-color: var(--forest);
+    box-shadow: 0 3px 10px rgba(26,58,40,0.2);
+  }
+
+  .glossary-az-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--foam);
+  }
+  .glossary-az-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .glossary-az-btn {
+    min-width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .glossary-az-btn:hover {
+    background: rgba(90,158,117,0.12);
+    color: var(--forest);
+  }
+  .glossary-az-btn.active {
+    background: var(--mint);
+    color: var(--deep);
+    border-color: var(--sage);
+    font-weight: 700;
+  }
+  .glossary-az-btn.disabled {
+    opacity: 0.25;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .glossary-status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .glossary-count-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--forest);
+    background: rgba(61,122,85,0.12);
+    border: 1px solid rgba(90,158,117,0.25);
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+  .glossary-reset-link {
+    font-size: 12px;
+    color: var(--red);
+    text-decoration: underline;
+    cursor: pointer;
+    display: none;
+  }
+
+  .glossary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 18px;
+  }
+  .glossary-card {
+    background: white;
+    border: 1px solid var(--foam);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .glossary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(45,90,64,0.1);
+    border-color: var(--sage);
+  }
+  .glossary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3.5px;
+    background: linear-gradient(90deg, var(--leaf), var(--sky));
+  }
+  .glossary-card[data-cat="ekosistem"]::before { background: linear-gradient(90deg, var(--leaf), var(--mint)); }
+  .glossary-card[data-cat="daya-dukung"]::before { background: linear-gradient(90deg, var(--warm), var(--terracotta)); }
+  .glossary-card[data-cat="pencemaran"]::before { background: linear-gradient(90deg, var(--red), var(--terracotta)); }
+  .glossary-card[data-cat="konservasi"]::before { background: linear-gradient(90deg, var(--ocean), var(--sky)); }
+  .glossary-card[data-cat="pembangunan"]::before { background: linear-gradient(90deg, var(--forest), var(--sage)); }
+
+  .glossary-card-top {
+    margin-bottom: 12px;
+  }
+  .glossary-badge-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .glossary-cat-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--sage);
+  }
+  .glossary-chapter-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--forest);
+    background: rgba(90,158,117,0.14);
+    border: 1px solid rgba(90,158,117,0.25);
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .glossary-chapter-pill:hover {
+    background: var(--leaf);
+    color: white;
+  }
+
+  .glossary-term-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--forest);
+    line-height: 1.25;
+    margin-bottom: 3px;
+  }
+  .glossary-term-en {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .glossary-desc {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .glossary-cmc-box {
+    background: rgba(61,122,85,0.08);
+    border-left: 3px solid var(--leaf);
+    padding: 8px 12px;
+    border-radius: 0 8px 8px 0;
+    font-size: 12px;
+    color: var(--forest);
+    line-height: 1.5;
+  }
+  .glossary-cmc-box strong {
+    color: var(--moss);
+  }
+
+  .glossary-empty {
+    text-align: center;
+    padding: 48px 24px;
+    background: white;
+    border: 1.5px dashed var(--foam);
+    border-radius: 16px;
+    color: var(--muted);
+    display: none;
+  }
+  .glossary-empty h4 {
+    font-size: 18px;
+    color: var(--forest);
+    margin: 12px 0 6px;
   }
 </style>
 </head>
@@ -469,6 +1157,7 @@
       <a href="#konservasi">05 Konservasi</a>
       <a href="#pembangunan">06 Pembangunan Berkelanjutan</a>
       <a href="#asesmen">07 Asesmen</a>
+      <a href="#glosarium" style="border-color:var(--warm);color:var(--warm);background:rgba(200,169,106,0.15)">📖 Glosarium</a>
       <a href="#cvcEssayEvaluator" style="border-color:var(--mint);color:var(--mint);background:rgba(126,201,154,0.15)">✨ AI Evaluator</a>
       <a href="javascript:void(0)" onclick="document.getElementById('cvcAiFab').click()" style="border-color:var(--sky);color:var(--sky);background:rgba(78,159,192,0.15)">🤖 Tanya AI</a>
     </nav>
@@ -1221,204 +1910,67 @@
   </div>
 
   <!-- ════════════════════════════════
-       PILIHAN GANDA
+       PILIHAN GANDA (INTERACTIVE QUIZ)
   ════════════════════════════════ -->
-  <h3 style="font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--forest);margin-bottom:6px;">Bagian A — Pilihan Ganda</h3>
-  <p style="font-size:13px;color:var(--muted);margin-bottom:24px;">8 soal · 1 menit 30 detik per soal · 5 poin per soal · Total: 40 poin</p>
+  <h3 style="font-family:'Playfair Display',serif;font-size:1.35rem;color:var(--forest);margin-bottom:6px;">Bagian A — Kuis Interaktif Pilihan Ganda</h3>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">8 soal mandiri · Analisis Konsep Keruangan &amp; Ekologi (Dimensi HEAD) · 5 poin per soal · Total: 40 poin</p>
 
-  <!-- PG 1 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
+  <!-- QUIZ LIVE DASHBOARD -->
+  <div class="quiz-dashboard" id="cvcQuizDashboard">
+    <div class="quiz-dash-top">
       <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 1 · Komponen Abiotik · 🧠 HEAD</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Komponen abiotik yang secara langsung menjadi <em>natural constraint</em> sekaligus penentu waktu penanaman bibit mangrove di Pantai Clungup dalam sistem silvofishery CMC adalah…</p>
+        <div class="quiz-dash-title">🎯 Evaluasi Mandiri Ecoliteracy (HEAD)</div>
+        <div style="font-size:12px;color:rgba(181,226,204,0.8);margin-top:2px;">Uji pemahaman konsepmu secara langsung dengan umpan balik otomatis &amp; pembahasan mendalam.</div>
       </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: C</div>
+      <div class="quiz-dash-stats">
+        <div class="quiz-stat-pill">Terjawab: <strong id="qAnsweredText">0 / 8</strong></div>
+        <div class="quiz-stat-pill">Skor: <strong id="qScoreText" style="color:var(--mint)">0 / 40 Poin</strong></div>
+      </div>
     </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ C. Ritme pasang surut air laut — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Penanaman bibit mangrove hanya bisa dilakukan <strong>saat air surut</strong> agar akar propagul dapat ditancapkan kuat ke substrat lumpur-sedimen. Pasang surut bertindak sebagai <em>natural constraint</em> (pembatas alam) sekaligus sebagai <em>peluang</em> — jadwal konservasi seluruh CMC harus diselaraskan dengan ritme ini. Inilah yang dimaksud dengan "faktor abiotik menentukan keberhasilan konservasi biotik."</p>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A (Cahaya &amp; Suhu):</strong> Berpengaruh pada pertumbuhan jangka panjang, bukan penentu <em>kapan</em> bibit bisa ditanam.</li>
-        <li><strong>B (Mineral &amp; Salinitas):</strong> Mempengaruhi kualitas tumbuh, bukan jadwal penanaman.</li>
-        <li><strong>D (Arus &amp; Kedalaman):</strong> Relevan untuk distribusi sedimen, tetapi bukan ritme harian penentu aktivitas penanaman.</li>
-        <li><strong>E (Curah Hujan &amp; Angin):</strong> Bersifat musiman dan tidak menentukan jadwal harian seperti pasang surut.</li>
-      </ul>
+    <div class="quiz-progress-track">
+      <div class="quiz-progress-bar-fill" id="qProgressFill"></div>
+    </div>
+    <div class="quiz-dash-actions">
+      <div class="subtext" id="qStatusHint">💡 Klik salah satu opsi jawaban (A–E) pada setiap kartu soal di bawah.</div>
+      <div class="quiz-btn-group">
+        <button type="button" class="quiz-btn secondary" onclick="resetCvcQuiz()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Reset Kuis
+        </button>
+        <button type="button" class="quiz-btn" onclick="revealAllCvcQuiz()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          Buka Semua Pembahasan
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- PG 2 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 2 · Ecological Footprint · 🧠 HEAD</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Di CMC, komponen jejak ekologis pengunjung yang menjadi <em>target utama</em> pengelolaan adalah…</p>
+  <!-- SCORECARD SUMMARY (Visible when completed or requested) -->
+  <div class="quiz-summary-card" id="cvcQuizSummary">
+    <div class="quiz-summary-grid">
+      <div class="quiz-score-circle">
+        <div class="quiz-score-num" id="summaryScoreNum">0</div>
+        <div class="quiz-score-max">DARI 40 POIN</div>
       </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: C</div>
-    </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ C. Waste Footprint — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;"><strong>Waste Footprint</strong> adalah satu-satunya komponen yang dapat dikelola <em>langsung di titik kunjungan</em> oleh pengelola CMC. Buktinya: sistem checklist barang (sejak 2014), denda Rp 100.000/item, program Adopsi Mangrove — semua dirancang khusus untuk menekan Waste Footprint ke nol. Komponen lain (carbon, cropland) lebih sulit diintervensi secara langsung di kawasan.</p>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A (Carbon Footprint Transportasi):</strong> CMC tidak dapat mengendalikan pilihan kendaraan pengunjung dari rumah menuju CMC.</li>
-        <li><strong>B (Food &amp; Consumption):</strong> Relevan, tetapi dikontrol melalui sistem checklist — bukan sebagai target mandiri.</li>
-        <li><strong>D (Physical Disturbance):</strong> Dikontrol melalui kuota TCC dan pemandu, bukan sistem checklist yang menjadi ikon CMC.</li>
-        <li><strong>E (Water Footprint):</strong> Tidak disebutkan sebagai perhatian utama dalam materi CMC.</li>
-      </ul>
+      <div>
+        <div class="quiz-badge-award" id="summaryBadge">HASIL EVALUASI ECOLITERACY</div>
+        <h4 class="quiz-summary-title" id="summaryTitle">Pencapaian Ecoliteracy Anda</h4>
+        <p class="quiz-summary-desc" id="summaryDesc">Selesaikan seluruh soal untuk melihat evaluasi dimensi HEAD Anda.</p>
+        <div class="quiz-summary-breakdown">
+          <div class="quiz-break-pill">✅ Benar: <strong id="summaryCorrectCount" style="color:var(--mint)">0</strong></div>
+          <div class="quiz-break-pill">❌ Salah: <strong id="summaryWrongCount" style="color:#f08080">0</strong></div>
+          <div class="quiz-break-pill">📊 Akurasi: <strong id="summaryAccuracy">0%</strong></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button type="button" class="quiz-btn" onclick="resetCvcQuiz()">🔄 Kerjakan Ulang</button>
+          <a href="#cvcEssayEvaluator" class="quiz-btn" style="background:var(--sky);border-color:var(--sky);color:#fff;text-decoration:none;">✍️ Lanjut ke AI Evaluator Esai</a>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- PG 3 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 3 · Blue Carbon · 🧠 HEAD</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Pernyataan yang BENAR tentang peran mangrove sebagai penyimpan blue carbon adalah…</p>
-      </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: B</div>
-    </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ B. Mangrove menyimpan 3–5× lebih banyak karbon di sedimen — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Keistimewaan blue carbon bukan hanya pada <em>jumlah</em> karbon yang diserap, melainkan pada <em>lokasi penyimpanan</em>: karbon dikunci di sedimen anaerob yang miskin oksigen di bawah akar mangrove — bukan di batang/daun seperti pohon darat. Kondisi ini membuatnya tersimpan selama ratusan hingga ribuan tahun. Ketika mangrove mati (misalnya akarnya tertutup plastik), sedimen teroksidasi dan karbon yang terkunci itu terlepas kembali ke atmosfer sebagai CO₂.</p>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A:</strong> Penyimpanan karbon mangrove justru jauh <em>lebih besar</em> dibanding hutan tropis daratan, dan lokasinya di sedimen — bukan hanya di batang/daun.</li>
-        <li><strong>C:</strong> Karbon yang tersimpan TIDAK bisa dipindahkan tanpa dampak — pemindahan/kerusakan justru melepas karbon ke atmosfer.</li>
-        <li><strong>D:</strong> Tidak ada batasan usia 50 tahun; penyerapan aktif sejak pohon tumbuh dan berakar di substrat.</li>
-        <li><strong>E:</strong> Blue carbon mencakup mangrove, padang lamun, dan rawa pasang surut — bukan hanya terumbu karang.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PG 4 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 4 · Triple Bottom Line · 🧠 HEAD</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Jika kualitas ekosistem mangrove CMC menurun drastis akibat abrasi, dampak berantai yang paling logis terhadap dua pilar lainnya adalah…</p>
-      </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: B</div>
-    </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ B. Ekonomi &amp; wisata menurun → pendapatan warga turun → konflik sosial meningkat — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Triple Bottom Line bekerja sebagai <strong>sistem domino dua arah</strong>. Ketika ekologi pulih, ketiga pilar menguat bersama. Ketika ekologi rusak, ketiganya runtuh bersama. Rantai sebab-akibatnya:</p>
-      <div style="background:rgba(200,169,106,0.1);border-radius:8px;padding:12px;font-size:12.5px;color:var(--muted);margin-bottom:10px;">
-        Mangrove abrasi → pantai tidak indah + perikanan menurun <strong>(Ekologi rusak)</strong><br>
-        → Wisatawan berkurang, tangkapan nelayan turun, pendapatan warga susut <strong>(Ekonomi melemah)</strong><br>
-        → Warga berebut sumber daya sisa, kemiskinan meningkat, konflik muncul kembali <strong>(Sosial terganggu)</strong>
-      </div>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A:</strong> Wisatawan yang datang melihat kerusakan adalah logika yang tidak realistis — CMC berbasis ekowisata, bukan wisata bencana.</li>
-        <li><strong>C, D:</strong> Mengatakan dua pilar independen dari ekologi bertentangan dengan prinsip dasar Triple Bottom Line yang saling berkaitan.</li>
-        <li><strong>E:</strong> Tiga pilar TBL secara definitif <em>tidak independen</em> — itulah inti dari konsep keberlanjutan.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PG 5 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 5 · Negative Externality · 🧠 HEAD</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Sistem checklist barang dengan denda Rp 100.000/item paling tepat dikategorikan sebagai…</p>
-      </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: C</div>
-    </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ C. Internalisasi Negative Externality — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;"><strong>Negative externality</strong> terjadi ketika pelaku aktivitas (wisatawan) menikmati manfaat (rekreasi) tetapi biaya kerusakannya ditanggung pihak lain (ekosistem, komunitas). Sistem denda CMC adalah solusi <em>internalisasi</em>: biaya yang tadinya "gratis" bagi wisatawan kini dibebankan langsung kepada si pelaku. Kata kuncinya bukan sekadar "negative externality terjadi" — melainkan sistem CMC sebagai mekanisme <em>penyelesaian</em> negative externality.</p>
-      <div style="background:rgba(200,169,106,0.1);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:10px;">
-        <strong>Jebakan soal:</strong> Opsi C menyebut "Negative Externality — wisatawan menanggung biaya dampak limbahnya sendiri." Ini benar karena <em>internalisasi</em>-nya yang menjadi kunci, bukan sekadar nama konsepnya.
-      </div>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A (Subsidi silang):</strong> Tidak ada mekanisme subsidi dari zona komersial ke konservasi dalam konteks ini.</li>
-        <li><strong>B (Positive Externality):</strong> Manfaat bagi pihak luar; sistem denda justru mengatasi <em>negative</em> externality.</li>
-        <li><strong>D (TCC):</strong> TCC berkaitan dengan pembatasan jumlah orang, bukan mekanisme penanganan sampah.</li>
-        <li><strong>E (EF Reduction via efisiensi energi):</strong> Sistem checklist tidak berkaitan dengan efisiensi energi.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PG 6 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 6 · Paradoks CMC · 🧠 HEAD · Analisis</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Meski wisatawan hampir 100% patuh, CMC tetap menemukan plastik di akar mangrove. Akar persoalan yang paling tepat adalah…</p>
-      </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: C</div>
-    </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ C. Sea-based pollution dari luar kawasan — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Ini adalah soal <strong>berpikir kritis tingkat tinggi</strong>. Kuncinya: jika wisatawan sudah patuh, maka sumber polutan bukan dari dalam kawasan. Plastik yang ditemukan berasal dari <strong>nelayan di perairan luar CMC</strong> yang membuang sampah ke laut dan terbawa arus masuk ke akar mangrove. Ini adalah <em>negative externality lintas yurisdiksi</em> — kawasan yang dikelola ketat harus menanggung polusi dari aktor di luar kendalinya. Fenomena ini tidak bisa diselesaikan hanya dengan sistem checklist internal CMC.</p>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A:</strong> Soal sudah menegaskan wisatawan hampir 100% patuh — ini bukan soal ketatnya pengawasan ranger.</li>
-        <li><strong>B:</strong> TCC Tiga Warna mengatur jumlah orang, bukan sumber sampah dari laut.</li>
-        <li><strong>D:</strong> Biological CC berkaitan dengan populasi organisme, bukan kemampuan menyaring polutan.</li>
-        <li><strong>E:</strong> Sudah dikesampingkan oleh premis soal: kepatuhan hampir 100%.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PG 7 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:16px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 7 · Prediksi Berbasis Bukti · 🧠 HEAD · C5 Evaluasi</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Jika upaya konservasi CMC terhenti 5 tahun ke depan, prediksi yang paling berbasis bukti adalah…</p>
-      </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: C</div>
-    </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ C. Pola historis pra-2012 akan berulang — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px;"><strong>Prediksi berbasis bukti</strong> berarti menggunakan data historis, bukan spekulasi. Data yang tersedia: sebelum 2012, penebangan mangrove menyebabkan banjir rob dan intrusi air laut ke sumur warga. Tanpa perawatan aktif, ekosistem mangrove <em>tidak memiliki mekanisme pemulihan otomatis</em> karena tekanan manusia akan kembali muncul. Rantai domino yang terputus akan berulang.</p>
-      <div style="background:rgba(196,74,58,0.08);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);margin-bottom:10px;">
-        Tanpa konservasi → Penebangan kembali → Tutupan mangrove berkurang → Abrasi meningkat → Banjir rob → Perikanan &amp; wisata kolaps → Kemiskinan nelayan meningkat
-      </div>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A:</strong> "Ekosistem pulih sendiri" hanya berlaku jika tekanan manusia dihilangkan — yang tidak realistis tanpa pengelolaan aktif.</li>
-        <li><strong>B:</strong> Sesuai materi, perikanan sangat bergantung pada ekosistem mangrove sebagai nursery ground — tidak bisa "tetap aman."</li>
-        <li><strong>D:</strong> Asumsi pemerintah otomatis mengambil alih tidak didukung fakta; CMC justru berhasil karena dikelola komunitas, bukan pemerintah.</li>
-        <li><strong>E:</strong> Ini jebakan ilmiah. Karbon memang terkunci di sedimen, tetapi <em>hanya selama ekosistem mangrove hidup dan sehat</em> — jika pohon mati, sedimen teroksidasi dan karbon terlepas.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PG 8 -->
-  <div style="background:white;border:1px solid var(--foam);border-radius:14px;padding:24px 28px;margin-bottom:32px;position:relative;overflow:hidden;">
-    <div style="position:absolute;top:0;left:0;width:4px;height:100%;background:var(--sky);"></div>
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px;">
-      <div>
-        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Soal 8 · Zonasi Spasial · 🧠 HEAD · Analisis Ekologi-Keruangan</div>
-        <p style="font-size:13.5px;color:var(--text);font-weight:500;max-width:560px;">Keuntungan strategi "lokalisasi dampak" dengan menjadikan Pantai Gatra sebagai satu-satunya zona berkemah dari perspektif ekologi-spasial adalah…</p>
-      </div>
-      <div style="background:var(--leaf);color:white;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;white-space:nowrap;height:fit-content;">Jawaban: B</div>
-    </div>
-    <div style="background:rgba(61,122,85,0.07);border-radius:10px;padding:16px;">
-      <div style="font-weight:600;font-size:12.5px;color:var(--forest);margin-bottom:8px;">✅ B. Memusatkan aktivitas manusia di satu titik agar 90% kawasan terlindung — <em>Mengapa ini benar?</em></div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Kata kunci soal adalah <strong>"perspektif ekologi-spasial"</strong> — bukan ekonomi atau administratif. Dengan memusatkan kemah hanya di Gatra, pengelola menerapkan prinsip <em>spatial concentration of impact</em>: dampak negatif (polusi cahaya buatan yang mengganggu penyu bertelur, polusi suara, limbah organik) terkonsentrasi di satu titik yang sudah dirancang untuk itu, sehingga 90% sisa kawasan terjaga bebas dari gangguan tersebut.</p>
-      <div style="font-weight:600;font-size:12px;color:var(--muted);margin-bottom:6px;">❌ Mengapa opsi lain salah?</div>
-      <ul style="font-size:12px;color:var(--muted);padding-left:16px;">
-        <li><strong>A (Pendapatan merata):</strong> Ini perspektif ekonomi, bukan ekologi-spasial. Distribusi manfaat ekonomi bukan tujuan utama zonasi kemah.</li>
-        <li><strong>C (Legalitas UU):</strong> Perspektif hukum/administratif, bukan ekologis.</li>
-        <li><strong>D (Fasilitas wisatawan):</strong> Ini perspektif kenyamanan wisatawan, bukan kepentingan ekosistem.</li>
-        <li><strong>E (Meningkatkan TCC total):</strong> Lokalisasi dampak justru <em>membatasi</em>, bukan meningkatkan TCC keseluruhan kawasan.</li>
-      </ul>
-    </div>
-  </div>
+  <!-- CONTAINER KARTU SOAL -->
+  <div id="cvcQuizCardsContainer"></div>
 
   <!-- ════════════════════════════════
        ESAI PENDEK
@@ -1610,6 +2162,67 @@
     <cite>— Adaptasi dari prinsip Community-Based Conservation, CMC 2026</cite>
   </div>
 </div>
+<!-- ══════════════════════════════════════════════════
+     GLOSARIUM INTERAKTIF
+══════════════════════════════════════════════════ -->
+<section id="glosarium" class="band" style="background:#f7f3ec;border-top:1px solid var(--foam);">
+<div class="container">
+  <div class="sec-header" style="padding-top:20px;">
+    <div class="sec-num">Kamus Konseptual</div>
+    <h2 class="sec-title">Glosarium Lingkungan Hidup<br><em>&amp; Studi Kasus CMC</em></h2>
+    <p class="sec-desc">Kompilasi istilah kunci geografi, terminologi ekologi pesisir, dan kebijakan konservasi kontekstual untuk SMA Fase F.</p>
+  </div>
+  <div class="divider"><span>📖</span></div>
+
+  <div class="glossary-wrapper">
+    <!-- KONTROL PENCARIAN & FILTER -->
+    <div class="glossary-controls">
+      <!-- Search Input -->
+      <div class="glossary-search-box">
+        <span class="glossary-search-icon">🔍</span>
+        <input type="text" id="glossarySearchInput" placeholder="Cari istilah, konsep, atau kata kunci (contoh: blue carbon, denda, TCC, sedimen)..." oninput="handleGlossarySearch()">
+        <button type="button" id="glossaryClearBtn" class="glossary-clear-btn" onclick="clearGlossarySearch()" title="Hapus pencarian">✕</button>
+      </div>
+
+      <!-- Filter Kategori & Abjad -->
+      <div class="glossary-filter-group">
+        <div class="glossary-cat-chips">
+          <button type="button" class="glossary-chip active" data-cat="all" onclick="filterGlossaryCategory('all', this)">✨ Semua Istilah</button>
+          <button type="button" class="glossary-chip" data-cat="ekosistem" onclick="filterGlossaryCategory('ekosistem', this)">🌿 Ekosistem &amp; Pesisir</button>
+          <button type="button" class="glossary-chip" data-cat="daya-dukung" onclick="filterGlossaryCategory('daya-dukung', this)">⚖️ Daya Dukung &amp; Jejak</button>
+          <button type="button" class="glossary-chip" data-cat="pencemaran" onclick="filterGlossaryCategory('pencemaran', this)">⚠️ Pencemaran &amp; Masalah</button>
+          <button type="button" class="glossary-chip" data-cat="konservasi" onclick="filterGlossaryCategory('konservasi', this)">🛡️ Konservasi &amp; Solusi</button>
+          <button type="button" class="glossary-chip" data-cat="pembangunan" onclick="filterGlossaryCategory('pembangunan', this)">🌍 Pembangunan Berkelanjutan</button>
+        </div>
+
+        <div class="glossary-az-bar" id="glossaryAzBar">
+          <span class="glossary-az-label">Abjad:</span>
+          <!-- Tombol A-Z digenerate dinamis via JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- STATUS & STATS -->
+    <div class="glossary-status-row">
+      <div>
+        Menampilkan <strong id="glossaryShowingCount" class="glossary-count-badge">0 Istilah</strong>
+        <span id="glossaryActiveFilterDesc" style="margin-left:8px;font-size:12.5px;"></span>
+      </div>
+      <span id="glossaryResetBtn" class="glossary-reset-link" onclick="resetAllGlossaryFilters()">Reset Semua Filter</span>
+    </div>
+
+    <!-- GRID KARTU GLOSARIUM -->
+    <div class="glossary-grid" id="glossaryGrid"></div>
+
+    <!-- PESAN JIKA TIDAK DITEMUKAN -->
+    <div class="glossary-empty" id="glossaryEmpty">
+      <div style="font-size:36px;">🔍</div>
+      <h4>Istilah Tidak Ditemukan</h4>
+      <p id="glossaryEmptyMsg">Tidak ada istilah yang cocok dengan kata kunci pencarian Anda.</p>
+      <button type="button" class="quiz-btn" style="margin-top:14px;background:var(--forest);color:white;" onclick="resetAllGlossaryFilters()">Tampilkan Semua Istilah</button>
+    </div>
+  </div>
+</div>
 </section>
 
 <!-- FOOTER -->
@@ -1637,6 +2250,1063 @@
     e.target.classList.add('active');
     const target = parent.querySelector('#' + id);
     if(target) target.classList.add('active');
+  }
+
+  // ═══ INTERACTIVE QUIZ CONTROLLER (BAB 07) ═══
+  const QUIZ_DATA = [
+    {
+      id: 1,
+      tag: "Soal 1 · Komponen Abiotik · 🧠 HEAD · 5 Poin",
+      text: "Komponen abiotik yang secara langsung menjadi <em>natural constraint</em> sekaligus penentu waktu penanaman bibit mangrove di Pantai Clungup dalam sistem silvofishery CMC adalah…",
+      correct: "C",
+      options: [
+        { key: "A", text: "Cahaya matahari & Suhu udara" },
+        { key: "B", text: "Kadar mineral & Salinitas air" },
+        { key: "C", text: "Ritme pasang surut air laut" },
+        { key: "D", text: "Arus laut & Kedalaman perairan" },
+        { key: "E", text: "Curah hujan & Kecepatan angin" }
+      ],
+      expCorrect: "Penanaman bibit mangrove hanya bisa dilakukan <strong>saat air surut</strong> agar akar propagul dapat ditancapkan kuat ke substrat lumpur-sedimen. Pasang surut bertindak sebagai <em>natural constraint</em> (pembatas alam) sekaligus sebagai <em>peluang</em> — jadwal konservasi seluruh CMC harus diselaraskan dengan ritme ini. Inilah yang dimaksud dengan \"faktor abiotik menentukan keberhasilan konservasi biotik.\"",
+      expWrong: [
+        "<strong>A (Cahaya & Suhu):</strong> Berpengaruh pada pertumbuhan jangka panjang, bukan penentu kapan bibit bisa ditanam.",
+        "<strong>B (Mineral & Salinitas):</strong> Mempengaruhi kualitas tumbuh, bukan jadwal penanaman.",
+        "<strong>D (Arus & Kedalaman):</strong> Relevan untuk distribusi sedimen, tetapi bukan ritme harian penentu aktivitas penanaman.",
+        "<strong>E (Curah Hujan & Angin):</strong> Bersifat musiman dan tidak menentukan jadwal harian seperti pasang surut."
+      ]
+    },
+    {
+      id: 2,
+      tag: "Soal 2 · Ecological Footprint · 🧠 HEAD · 5 Poin",
+      text: "Di CMC, komponen jejak ekologis pengunjung yang menjadi <em>target utama</em> pengelolaan adalah…",
+      correct: "C",
+      options: [
+        { key: "A", text: "Carbon Footprint Transportasi" },
+        { key: "B", text: "Food & Consumption Footprint" },
+        { key: "C", text: "Waste Footprint (Jejak Sampah)" },
+        { key: "D", text: "Physical Disturbance Footprint" },
+        { key: "E", text: "Water Footprint" }
+      ],
+      expCorrect: "<strong>Waste Footprint</strong> adalah satu-satunya komponen yang dapat dikelola <em>langsung di titik kunjungan</em> oleh pengelola CMC. Buktinya: sistem checklist barang (sejak 2014), denda Rp 100.000/item, program Adopsi Mangrove — semua dirancang khusus untuk menekan Waste Footprint ke nol. Komponen lain (carbon, cropland) lebih sulit diintervensi secara langsung di kawasan.",
+      expWrong: [
+        "<strong>A (Carbon Footprint Transportasi):</strong> CMC tidak dapat mengendalikan pilihan kendaraan pengunjung dari rumah menuju CMC.",
+        "<strong>B (Food & Consumption):</strong> Relevan, tetapi dikontrol melalui sistem checklist — bukan sebagai target mandiri.",
+        "<strong>D (Physical Disturbance):</strong> Dikontrol melalui kuota TCC dan pemandu, bukan sistem checklist yang menjadi ikon CMC.",
+        "<strong>E (Water Footprint):</strong> Tidak disebutkan sebagai perhatian utama dalam materi CMC."
+      ]
+    },
+    {
+      id: 3,
+      tag: "Soal 3 · Blue Carbon · 🧠 HEAD · 5 Poin",
+      text: "Pernyataan yang BENAR tentang peran mangrove sebagai penyimpan blue carbon adalah…",
+      correct: "B",
+      options: [
+        { key: "A", text: "Karbon disimpan di batang dan daun lebih banyak dibanding hutan tropis" },
+        { key: "B", text: "Mangrove menyimpan 3–5× lebih banyak karbon di sedimen" },
+        { key: "C", text: "Karbon yang tersimpan dapat dipindahkan tanpa dampak lingkungan" },
+        { key: "D", text: "Mangrove hanya menyerap karbon setelah mencapai usia 50 tahun" },
+        { key: "E", text: "Blue carbon hanya dihasilkan oleh ekosistem terumbu karang" }
+      ],
+      expCorrect: "Keistimewaan blue carbon bukan hanya pada <em>jumlah</em> karbon yang diserap, melainkan pada <em>lokasi penyimpanan</em>: karbon dikunci di sedimen anaerob yang miskin oksigen di bawah akar mangrove — bukan di batang/daun seperti pohon darat. Kondisi ini membuatnya tersimpan selama ratusan hingga ribuan tahun. Ketika mangrove mati (misalnya akarnya tertutup plastik), sedimen teroksidasi dan karbon yang terkunci itu terlepas kembali ke atmosfer sebagai CO₂.",
+      expWrong: [
+        "<strong>A:</strong> Penyimpanan karbon mangrove justru jauh lebih besar dibanding hutan tropis daratan, dan lokasinya di sedimen — bukan hanya di batang/daun.",
+        "<strong>C:</strong> Karbon yang tersimpan TIDAK bisa dipindahkan tanpa dampak — pemindahan/kerusakan justru melepas karbon ke atmosfer.",
+        "<strong>D:</strong> Tidak ada batasan usia 50 tahun; penyerapan aktif sejak pohon tumbuh dan berakar di substrat.",
+        "<strong>E:</strong> Blue carbon mencakup mangrove, padang lamun, dan rawa pasang surut — bukan hanya terumbu karang."
+      ]
+    },
+    {
+      id: 4,
+      tag: "Soal 4 · Triple Bottom Line · 🧠 HEAD · 5 Poin",
+      text: "Jika kualitas ekosistem mangrove CMC menurun drastis akibat abrasi, dampak berantai yang paling logis terhadap dua pilar lainnya adalah…",
+      correct: "B",
+      options: [
+        { key: "A", text: "Wisatawan meningkat karena tertarik melihat fenomena abrasi pantai" },
+        { key: "B", text: "Ekonomi & wisata menurun → pendapatan warga turun → konflik sosial meningkat" },
+        { key: "C", text: "Pilar ekonomi tetap stabil karena wisatawan beralih ke pantai lain" },
+        { key: "D", text: "Pilar sosial tidak terpengaruh karena masyarakat memiliki alternatif melaut" },
+        { key: "E", text: "Ketiga pilar Triple Bottom Line bekerja secara independen satu sama lain" }
+      ],
+      expCorrect: "Triple Bottom Line bekerja sebagai <strong>sistem domino dua arah</strong>. Ketika ekologi pulih, ketiga pilar menguat bersama. Ketika ekologi rusak, ketiganya runtuh bersama. Rantai sebab-akibatnya: Mangrove abrasi → pantai rusak & perikanan anjlok (Ekologi) → Wisatawan turun & pendapatan susut (Ekonomi) → Warga berebut sumber daya & kemiskinan meningkat (Sosial).",
+      expWrong: [
+        "<strong>A:</strong> Wisatawan yang datang melihat kerusakan adalah logika yang tidak realistis — CMC berbasis ekowisata, bukan wisata bencana.",
+        "<strong>C, D:</strong> Mengatakan dua pilar independen dari ekologi bertentangan dengan prinsip dasar Triple Bottom Line yang saling berkaitan.",
+        "<strong>E:</strong> Tiga pilar TBL secara definitif tidak independen — itulah inti dari konsep keberlanjutan."
+      ]
+    },
+    {
+      id: 5,
+      tag: "Soal 5 · Negative Externality · 🧠 HEAD · 5 Poin",
+      text: "Sistem checklist barang dengan denda Rp 100.000/item paling tepat dikategorikan sebagai…",
+      correct: "C",
+      options: [
+        { key: "A", text: "Subsidi silang zona komersial ke zona konservasi" },
+        { key: "B", text: "Pemanfaatan mekanisme Positive Externality" },
+        { key: "C", text: "Internalisasi Negative Externality" },
+        { key: "D", text: "Pembatasan Tourism Carrying Capacity (TCC)" },
+        { key: "E", text: "Reduksi Ecological Footprint melalui efisiensi energi" }
+      ],
+      expCorrect: "<strong>Negative externality</strong> terjadi ketika pelaku aktivitas (wisatawan) menikmati manfaat (rekreasi) tetapi biaya kerusakannya ditanggung pihak lain (ekosistem, komunitas). Sistem denda CMC adalah solusi <em>internalisasi</em>: biaya yang tadinya \"gratis\" bagi wisatawan kini dibebankan langsung kepada si pelaku. Sistem CMC bertindak sebagai mekanisme <em>penyelesaian</em> negative externality.",
+      expWrong: [
+        "<strong>A (Subsidi silang):</strong> Tidak ada mekanisme subsidi dari zona komersial ke konservasi dalam konteks ini.",
+        "<strong>B (Positive Externality):</strong> Manfaat bagi pihak luar; sistem denda justru mengatasi negative externality.",
+        "<strong>D (TCC):</strong> TCC berkaitan dengan pembatasan jumlah orang, bukan mekanisme penanganan sampah.",
+        "<strong>E (EF Reduction via efisiensi energi):</strong> Sistem checklist tidak berkaitan dengan efisiensi energi."
+      ]
+    },
+    {
+      id: 6,
+      tag: "Soal 6 · Paradoks CMC · 🧠 HEAD · Analisis C4 · 5 Poin",
+      text: "Meski wisatawan hampir 100% patuh, CMC tetap menemukan plastik di akar mangrove. Akar persoalan yang paling tepat adalah…",
+      correct: "C",
+      options: [
+        { key: "A", text: "Kelengahan pengawasan ranger di pos pemeriksaan tiket" },
+        { key: "B", text: "Pelanggaran kuota harian TCC di Pantai Tiga Warna" },
+        { key: "C", text: "Sea-based pollution dari luar kawasan yang terbawa arus laut" },
+        { key: "D", text: "Penurunan daya filtrasi Biological Carrying Capacity" },
+        { key: "E", text: "Wisatawan menyembunyikan sampah dari pemeriksaan pos" }
+      ],
+      expCorrect: "Ini adalah soal <strong>berpikir kritis tingkat tinggi</strong>. Kuncinya: jika wisatawan sudah patuh, maka sumber polutan bukan dari dalam kawasan. Plastik yang ditemukan berasal dari <strong>nelayan di perairan luar CMC</strong> yang membuang sampah ke laut dan terbawa arus masuk ke akar mangrove. Ini adalah <em>negative externality lintas yurisdiksi</em> — kawasan yang dikelola ketat harus menanggung polusi dari aktor di luar kendalinya.",
+      expWrong: [
+        "<strong>A:</strong> Soal sudah menegaskan wisatawan hampir 100% patuh — ini bukan soal ketatnya pengawasan ranger.",
+        "<strong>B:</strong> TCC Tiga Warna mengatur jumlah orang, bukan sumber sampah dari laut.",
+        "<strong>D:</strong> Biological CC berkaitan dengan populasi organisme, bukan kemampuan menyaring polutan.",
+        "<strong>E:</strong> Sudah dikesampingkan oleh premis soal: kepatuhan hampir 100%."
+      ]
+    },
+    {
+      id: 7,
+      tag: "Soal 7 · Prediksi Berbasis Bukti · 🧠 HEAD · Evaluasi C5 · 5 Poin",
+      text: "Jika upaya konservasi CMC terhenti 5 tahun ke depan, prediksi yang paling berbasis bukti adalah…",
+      correct: "C",
+      options: [
+        { key: "A", text: "Ekosistem akan pulih dengan sendirinya tanpa campur tangan manusia" },
+        { key: "B", text: "Perikanan nelayan tetap aman karena tidak bergantung pada mangrove" },
+        { key: "C", text: "Pola historis pra-2012 akan berulang (abrasi, rob, dan kemiskinan)" },
+        { key: "D", text: "Pemerintah pusat secara otomatis mengambil alih pengelolaan kawasan" },
+        { key: "E", text: "Karbon di sedimen tetap tersimpan meski seluruh mangrove mati" }
+      ],
+      expCorrect: "<strong>Prediksi berbasis bukti</strong> berarti menggunakan data historis, bukan spekulasi. Data historis membuktikan: sebelum 2012, penebangan mangrove menyebabkan abrasi parah, banjir rob, dan intrusi air laut ke sumur warga. Tanpa perawatan aktif dan pengawasan ranger, tekanan eksploitasi manusia akan kembali muncul sehingga pola pra-2012 berulang.",
+      expWrong: [
+        "<strong>A:</strong> Ekosistem pulih sendiri hanya jika tekanan manusia dihilangkan — ini tidak realistis tanpa pengelolaan aktif.",
+        "<strong>B:</strong> Perikanan sangat bergantung pada ekosistem mangrove sebagai nursery ground biota laut.",
+        "<strong>D:</strong> Asumsi intervensi otomatis pemerintah tidak didukung fakta historis keberhasilan berbasis komunitas.",
+        "<strong>E:</strong> Jebakan ilmiah: jika pohon mati, sedimen teroksidasi dan blue carbon terlepas ke udara sebagai CO₂."
+      ]
+    },
+    {
+      id: 8,
+      tag: "Soal 8 · Zonasi Spasial · 🧠 HEAD · Analisis Ekologi-Keruangan · 5 Poin",
+      text: "Keuntungan strategi \"lokalisasi dampak\" dengan menjadikan Pantai Gatra sebagai satu-satunya zona berkemah dari perspektif ekologi-spasial adalah…",
+      correct: "B",
+      options: [
+        { key: "A", text: "Memastikan pendapatan sewa tenda terbagi merata ke seluruh warga" },
+        { key: "B", text: "Memusatkan aktivitas manusia di satu titik agar 90% kawasan terlindung" },
+        { key: "C", text: "Memenuhi syarat legalitas perizinan dari dinas pariwisata daerah" },
+        { key: "D", text: "Memberikan kemudahan fasilitas dan akses logistik bagi wisatawan" },
+        { key: "E", text: "Meningkatkan total daya dukung (TCC) keseluruhan kawasan CMC" }
+      ],
+      expCorrect: "Kata kunci soal adalah <strong>\"perspektif ekologi-spasial\"</strong> — bukan ekonomi atau administratif. Dengan memusatkan kemah hanya di Gatra, pengelola menerapkan prinsip <em>spatial concentration of impact</em>: dampak negatif (polusi cahaya yang mengganggu penyu bertelur, polusi suara, limbah organik) terkonsentrasi di satu titik yang sudah dirancang untuk itu, sehingga 90% sisa kawasan terjaga bebas dari gangguan.",
+      expWrong: [
+        "<strong>A (Pendapatan merata):</strong> Ini perspektif ekonomi, bukan ekologi-spasial.",
+        "<strong>C (Legalitas UU):</strong> Perspektif hukum/administratif, bukan ekologis.",
+        "<strong>D (Fasilitas wisatawan):</strong> Ini perspektif kenyamanan wisatawan, bukan kepentingan ekosistem.",
+        "<strong>E (Meningkatkan TCC total):</strong> Lokalisasi dampak justru membatasi, bukan meningkatkan TCC keseluruhan kawasan."
+      ]
+    }
+  ];
+
+  let cvcQuizState = {
+    userAnswers: {},
+    revealedAll: false
+  };
+
+  function renderCvcQuiz() {
+    const container = document.getElementById('cvcQuizCardsContainer');
+    if (!container) return;
+
+    container.innerHTML = QUIZ_DATA.map((q, idx) => {
+      const qNum = idx + 1;
+      const userChoice = cvcQuizState.userAnswers[q.id];
+      const isAnswered = userChoice !== undefined;
+      const isCorrect = userChoice === q.correct;
+
+      let cardClass = "quiz-card";
+      let statusHtml = `<span class="quiz-q-status" id="qStatus-${q.id}">Belum Dijawab</span>`;
+      let expClass = "quiz-explanation";
+
+      if (isAnswered) {
+        if (isCorrect) {
+          cardClass += " answered-correct";
+          statusHtml = `<span class="quiz-q-status correct" id="qStatus-${q.id}">✅ Benar (+5 Poin)</span>`;
+        } else {
+          cardClass += " answered-wrong";
+          statusHtml = `<span class="quiz-q-status wrong" id="qStatus-${q.id}">❌ Belum Tepat (0 Poin)</span>`;
+        }
+        expClass += " show";
+      } else if (cvcQuizState.revealedAll) {
+        expClass += " show";
+        statusHtml = `<span class="quiz-q-status" style="background:var(--forest);color:white;" id="qStatus-${q.id}">Kunci: ${q.correct}</span>`;
+      }
+
+      const optionsHtml = q.options.map(opt => {
+        let optClass = "quiz-opt-btn";
+        let icon = "";
+        const disabled = isAnswered || cvcQuizState.revealedAll ? "disabled" : "";
+
+        if (isAnswered) {
+          if (opt.key === userChoice) {
+            optClass += isCorrect ? " is-correct" : " is-wrong";
+            icon = isCorrect ? "✅" : "❌";
+          } else if (!isCorrect && opt.key === q.correct) {
+            optClass += " is-revealed-correct";
+            icon = "✅ (Kunci)";
+          }
+        } else if (cvcQuizState.revealedAll) {
+          if (opt.key === q.correct) {
+            optClass += " is-revealed-correct";
+            icon = "✅ (Kunci)";
+          }
+        }
+
+        return `
+          <button type="button" class="${optClass}" ${disabled} onclick="selectCvcOption(${q.id}, '${opt.key}')">
+            <span class="opt-badge">${opt.key}</span>
+            <span class="opt-text">${opt.text}</span>
+            <span class="opt-icon">${icon}</span>
+          </button>
+        `;
+      }).join('');
+
+      const wrongListHtml = q.expWrong.map(item => `<li>${item}</li>`).join('');
+
+      return `
+        <div class="${cardClass}" id="qCard-${q.id}">
+          <div class="quiz-card-bar"></div>
+          <div class="quiz-q-header">
+            <div>
+              <div class="quiz-q-tag">${q.tag}</div>
+              <p class="quiz-q-text">${q.text}</p>
+            </div>
+            ${statusHtml}
+          </div>
+
+          <div class="quiz-options">
+            ${optionsHtml}
+          </div>
+
+          <div class="${expClass}" id="qExp-${q.id}">
+            <div class="quiz-exp-header">
+              <span>💡 Pembahasan Mendalam (Kunci: ${q.correct})</span>
+            </div>
+            <div class="quiz-exp-body">
+              ${q.expCorrect}
+            </div>
+            <div class="quiz-exp-wrong-title">❌ Mengapa opsi lain salah?</div>
+            <ul class="quiz-exp-wrong-list">
+              ${wrongListHtml}
+            </ul>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    updateCvcQuizDashboard();
+  }
+
+  function selectCvcOption(qId, chosenKey) {
+    if (cvcQuizState.userAnswers[qId] !== undefined) return;
+
+    cvcQuizState.userAnswers[qId] = chosenKey;
+    renderCvcQuiz();
+
+    // Check completion
+    const totalAnswered = Object.keys(cvcQuizState.userAnswers).length;
+    if (totalAnswered === QUIZ_DATA.length) {
+      showCvcQuizSummary();
+    }
+  }
+
+  function updateCvcQuizDashboard() {
+    const totalQ = QUIZ_DATA.length;
+    const answeredKeys = Object.keys(cvcQuizState.userAnswers);
+    const answeredCount = answeredKeys.length;
+
+    let score = 0;
+    let correctCount = 0;
+    answeredKeys.forEach(id => {
+      const q = QUIZ_DATA.find(item => item.id === Number(id));
+      if (q && cvcQuizState.userAnswers[id] === q.correct) {
+        score += 5;
+        correctCount++;
+      }
+    });
+
+    const percent = Math.round((answeredCount / totalQ) * 100);
+    const ansText = document.getElementById('qAnsweredText');
+    const scoreText = document.getElementById('qScoreText');
+    const barFill = document.getElementById('qProgressFill');
+    const hint = document.getElementById('qStatusHint');
+
+    if (ansText) ansText.innerText = `${answeredCount} / ${totalQ}`;
+    if (scoreText) scoreText.innerText = `${score} / ${totalQ * 5} Poin`;
+    if (barFill) barFill.style.width = `${percent}%`;
+
+    if (hint) {
+      if (answeredCount === 0) {
+        hint.innerText = "💡 Klik salah satu opsi jawaban (A–E) pada setiap kartu soal di bawah.";
+      } else if (answeredCount < totalQ) {
+        hint.innerText = `Sedang berlangsung: ${totalQ - answeredCount} soal tersisa. Jawaban benar: ${correctCount} (${score} poin).`;
+      } else {
+        hint.innerText = "🎉 Seluruh 8 soal telah selesai dijawab! Lihat hasil evaluasi lengkap di atas.";
+      }
+    }
+  }
+
+  function showCvcQuizSummary() {
+    const summaryCard = document.getElementById('cvcQuizSummary');
+    if (!summaryCard) return;
+
+    const totalQ = QUIZ_DATA.length;
+    let score = 0;
+    let correctCount = 0;
+
+    Object.keys(cvcQuizState.userAnswers).forEach(id => {
+      const q = QUIZ_DATA.find(item => item.id === Number(id));
+      if (q && cvcQuizState.userAnswers[id] === q.correct) {
+        score += 5;
+        correctCount++;
+      }
+    });
+
+    const wrongCount = totalQ - correctCount;
+    const accuracy = Math.round((correctCount / totalQ) * 100);
+
+    let badge = "ECOLITERACY NOVICE";
+    let title = "Perlu Penguatan Materi";
+    let desc = "Pemahaman konsep dasar ekologi CMC masih perlu diulas kembali. Silakan baca ulang Bab 01 sampai Bab 06 untuk mempertajam analisis spasial dan lingkungan.";
+
+    if (score === 40) {
+      badge = "🌟 ECOLITERACY MASTER";
+      title = "Pemahaman Sempurna (100%)";
+      desc = "Luar biasa! Seluruh konsep keruangan, penyerapan blue carbon, daya dukung TCC, eksternalitas negatif, hingga zonasi spasial CMC telah Anda kuasai dengan sangat komprehensif.";
+    } else if (score >= 30) {
+      badge = "🌿 ECOLITERACY ADVANCED";
+      title = "Pemahaman Sangat Baik";
+      desc = "Sangat memuaskan! Anda memahami keterkaitan erat sistemik antara ekologi pesisir, kesejahteraan ekonomi nelayan, dan kohesi sosial di CMC Malang Selatan.";
+    } else if (score >= 20) {
+      badge = "🌱 ECOLITERACY DEVELOPING";
+      title = "Pemahaman Cukup Baik";
+      desc = "Fondasi Anda sudah terbangun. Perhatikan kembali rincian teknis seperti lokasi penyimpanan blue carbon di sedimen serta konsep lokalisasi dampak di Pantai Gatra.";
+    }
+
+    document.getElementById('summaryScoreNum').innerText = score;
+    document.getElementById('summaryBadge').innerText = badge;
+    document.getElementById('summaryTitle').innerText = title;
+    document.getElementById('summaryDesc').innerText = desc;
+    document.getElementById('summaryCorrectCount').innerText = correctCount;
+    document.getElementById('summaryWrongCount').innerText = wrongCount;
+    document.getElementById('summaryAccuracy').innerText = `${accuracy}%`;
+
+    summaryCard.classList.add('show');
+    summaryCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function resetCvcQuiz() {
+    cvcQuizState.userAnswers = {};
+    cvcQuizState.revealedAll = false;
+    const summaryCard = document.getElementById('cvcQuizSummary');
+    if (summaryCard) summaryCard.classList.remove('show');
+    renderCvcQuiz();
+
+    const dash = document.getElementById('cvcQuizDashboard');
+    if (dash) dash.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function revealAllCvcQuiz() {
+    cvcQuizState.revealedAll = true;
+    renderCvcQuiz();
+  }
+
+  // ═══ GLOSARIUM INTERAKTIF DATA & CONTROLLER ═══
+  const GLOSSARY_DATA = [
+    {
+      id: "abrasi",
+      term: "Abrasi Pantai",
+      en: "Coastal Erosion",
+      letter: "A",
+      category: "pencemaran",
+      categoryLabel: "Pencemaran & Masalah",
+      chapter: "Bab 04",
+      chapterLink: "#pencemaran",
+      def: "Proses pengikisan daerah pesisir pantai akibat hantaman ombak, arus laut, dan pasang surut air laut yang menyebabkan mundurnya garis pantai dan hilangnya daratan pesisir.",
+      cmc: "Sebelum tahun 2012, hilangnya sabuk mangrove akibat penebangan liar memicu abrasi hebat di Pantai Clungup dan Sendang Biru yang sempat mengikis akses jalan warga Tambakrejo."
+    },
+    {
+      id: "adopsi",
+      term: "Adopsi Mangrove & Karang",
+      en: "Tree & Coral Adoption Program",
+      letter: "A",
+      category: "konservasi",
+      categoryLabel: "Konservasi & Solusi",
+      chapter: "Bab 05",
+      chapterLink: "#konservasi",
+      def: "Mekanisme pembiayaan konservasi partisipatif di mana pengunjung atau institusi mendonasikan dana untuk menanam, memberi label kode, serta merawat bibit mangrove atau rak karang secara terpantau.",
+      cmc: "Wisatawan di CMC dapat mengadopsi bibit mangrove atau fragmen karang dengan barcode sertifikat digital yang dipantau pertumbuhannya berkala oleh para ranger."
+    },
+    {
+      id: "aliran-energi",
+      term: "Aliran Energi",
+      en: "Energy Flow in Ecosystems",
+      letter: "A",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 01",
+      chapterLink: "#konsep",
+      def: "Jalur perpindahan energi satu arah dari radiasi matahari yang ditangkap produsen (tumbuhan), diteruskan ke konsumen melalui rantai makanan, hingga terdisipasi sebagai panas di tingkat dekomposer.",
+      cmc: "Serasah daun mangrove yang gugur menjadi sumber energi bagi mikroorganisme dan kepiting bakau, menopang ikan-ikan karang kecil di perairan Clungup dan Gatra."
+    },
+    {
+      id: "apartemen-ikan",
+      term: "Apartemen Ikan (Fish Apartment)",
+      en: "Artificial Reef Structure",
+      letter: "A",
+      category: "konservasi",
+      categoryLabel: "Konservasi & Solusi",
+      chapter: "Bab 05",
+      chapterLink: "#konservasi",
+      def: "Struktur beton buatan ramah lingkungan bersekat rongga yang ditenggelamkan ke dasar laut untuk menyediakan tempat berlindung, berkembang biak (nursery), dan memijah bagi biota laut di karang yang rusak.",
+      cmc: "Dipasang oleh tim konservasi CMC di sekitar perairan Pulau Sempu dan Pantai Tiga Warna untuk memulihkan populasi ikan kerapu dan ikan karang hias."
+    },
+    {
+      id: "avicennia",
+      term: "Avicennia marina (Api-api)",
+      en: "Grey Mangrove / Pioneer Mangrove",
+      letter: "A",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Spesies pohon mangrove pionir yang sangat tahan salinitas tinggi dan memiliki kelenjar ekskresi garam di daun serta perakaran pneumatofora untuk hidup di zona pasang surut terdepan.",
+      cmc: "Membentuk benteng vegetasi terluar di pesisir Pantai Clungup yang langsung menahan gempuran pasang air asin Samudra Hindia."
+    },
+    {
+      id: "bioakumulasi",
+      term: "Bioakumulasi",
+      en: "Bioaccumulation",
+      letter: "B",
+      category: "pencemaran",
+      categoryLabel: "Pencemaran & Masalah",
+      chapter: "Bab 04",
+      chapterLink: "#pencemaran",
+      def: "Proses penumpukan zat polutan berbahaya secara kumulatif di dalam organ/lemak tubuh suatu organisme karena laju penyerapan zat lebih cepat daripada laju ekskresinya.",
+      cmc: "Tumpahan solar kapal dan partikel polutan pelabuhan berisiko terakumulasi dalam jaringan tubuh kerang atau tiram yang hidup di akar mangrove."
+    },
+    {
+      id: "biokapasitas",
+      term: "Biokapasitas (Biocapacity)",
+      en: "Biological Carrying Capacity",
+      letter: "B",
+      category: "daya-dukung",
+      categoryLabel: "Daya Dukung & Jejak",
+      chapter: "Bab 03",
+      chapterLink: "#daya-dukung",
+      def: "Kapasitas ekosistem produktif suatu wilayah dalam menghasilkan biomassa sumber daya terbarukan sekaligus menyerap sisa limbah yang dihasilkan oleh aktivitas manusia.",
+      cmc: "Ekosistem mangrove dan lamun CMC memiliki biokapasitas tinggi dalam menyerap karbon dan menetralkan nutrien sedimen secara berkelanjutan."
+    },
+    {
+      id: "biomagnifikasi",
+      term: "Biomagnifikasi",
+      en: "Biomagnification / Bioamplification",
+      letter: "B",
+      category: "pencemaran",
+      categoryLabel: "Pencemaran & Masalah",
+      chapter: "Bab 04",
+      chapterLink: "#pencemaran",
+      def: "Kenaikan konsentrasi racun atau polutan (seperti mikroplastik dan logam berat) pada setiap tingkatan trofik rantai makanan hingga mencapai konsentrasi tertinggi di predator puncak.",
+      cmc: "Mikroplastik yang tertelan zooplankton diakumulasi oleh ikan kecil, lalu ikan besar, hingga akhirnya termakan oleh manusia penikmat ikan laut dengan konsentrasi toksin berlipat ganda."
+    },
+    {
+      id: "blue-carbon",
+      term: "Blue Carbon (Karbon Biru)",
+      en: "Coastal & Marine Carbon Sequestration",
+      letter: "B",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Karbon dioksida atmosfer yang diserap dan dikunci dalam jangka panjang oleh vegetasi pesisir dan laut (mangrove, padang lamun, rawa payau), terutama di dalam sedimen berlumpur yang anaerob.",
+      cmc: "Hutan mangrove di CMC menyimpan karbon 3–5× lebih banyak dibanding hutan hujan tropis daratan; jika rusak, simpanan karbon purba di sedimen akan teroksidasi dan terlepas ke udara sebagai gas rumah kaca."
+    },
+    {
+      id: "carrying-capacity",
+      term: "Carrying Capacity (Daya Dukung)",
+      en: "Environmental Carrying Capacity",
+      letter: "C",
+      category: "daya-dukung",
+      categoryLabel: "Daya Dukung & Jejak",
+      chapter: "Bab 03",
+      chapterLink: "#daya-dukung",
+      def: "Batas ambang maksimum kapasitas lingkungan dalam menopang kehidupan makhluk hidup atau intensitas aktivitas manusia tanpa menimbulkan degradasi fungsi ekologi permanen.",
+      cmc: "Diterapkan secara ketat oleh pengelola CMC untuk menghitung kuota kunjungan harian per zona agar pasir pantai dan karang tidak mengalami tekanan berlebih."
+    },
+    {
+      id: "cbc",
+      term: "Community-Based Conservation (CBC)",
+      en: "Konservasi Berbasis Masyarakat",
+      letter: "C",
+      category: "konservasi",
+      categoryLabel: "Konservasi & Solusi",
+      chapter: "Bab 05",
+      chapterLink: "#konservasi",
+      def: "Pendekatan konservasi yang menempatkan masyarakat lokal sebagai perencana, pemelihara, pengawas, dan penerima manfaat utama dari pemulihan keanekaragaman hayati wilayahnya.",
+      cmc: "Warga Desa Tambakrejo yang mulanya membalak mangrove secara liar kini menjadi garda terdepan ranger dan pemandu konservasi CMC melalui Kelompok Bhakti Alam."
+    },
+    {
+      id: "defisit-ekologis",
+      term: "Defisit Ekologis",
+      en: "Ecological Deficit",
+      letter: "D",
+      category: "daya-dukung",
+      categoryLabel: "Daya Dukung & Jejak",
+      chapter: "Bab 03",
+      chapterLink: "#daya-dukung",
+      def: "Situasi ketika jejak ekologis (konsumsi dan limbah manusia) melampaui biokapasitas biologis yang dapat disediakan dan dipulihkan oleh wilayah setempat.",
+      cmc: "Pembatasan kuota dan sistem denda CMC sengaja dibuat untuk mencegah defisit ekologis akibat ledakan wisatawan massal (mass tourism)."
+    },
+    {
+      id: "ecoliteracy",
+      term: "Ecoliteracy (Melek Ekologis)",
+      en: "Ecological Literacy (Head, Heart, Hand)",
+      letter: "E",
+      category: "pembangunan",
+      categoryLabel: "Pembangunan Berkelanjutan",
+      chapter: "Bab 07",
+      chapterLink: "#asesmen",
+      def: "Tingkat pemahaman mendalam tentang jejaring ekosistem (Head), tumbuhnya kesadaran etis-empati pada bumi (Heart), dan kesiapan bertindak nyata menjaga kelestarian lingkungan (Hand).",
+      cmc: "Platform CVC dibangun khusus untuk mengasah ecoliteracy siswa Fase F melalui studi kasus nyata dan evaluasi AI berbasis penalaran keruangan."
+    },
+    {
+      id: "ekosistem-pesisir",
+      term: "Ekosistem Pesisir",
+      en: "Coastal Ecosystem",
+      letter: "E",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Kesatuan fungsional antara komunitas biotik laut-darat dengan lingkungan abiotik di zona pertemuan dinamis antara pasang laut dan daratan.",
+      cmc: "Mencakup integrasi erat antara mangrove di Pantai Clungup, padang lamun di Pantai Gatra, dan terumbu karang di Teluk Pantai Tiga Warna."
+    },
+    {
+      id: "ekowisata",
+      term: "Ekowisata (Ecotourism)",
+      en: "Sustainable Nature Tourism",
+      letter: "E",
+      category: "konservasi",
+      categoryLabel: "Konservasi & Solusi",
+      chapter: "Bab 05",
+      chapterLink: "#konservasi",
+      def: "Pariwisata berbasis alam yang memprioritaskan pelestarian lingkungan, edukasi interpretatif bagi wisatawan, dan peningkatan taraf ekonomi masyarakat lokal tanpa eksploitasi berlebihan.",
+      cmc: "Setiap pengunjung di CMC diwajibkan didampingi pemandu lokal (guide) yang mengedukasi wisatawan mengenai etika snorkeling dan penanaman mangrove."
+    },
+    {
+      id: "eksternalitas-negatif",
+      term: "Eksternalitas Negatif",
+      en: "Negative Externality",
+      letter: "E",
+      category: "pencemaran",
+      categoryLabel: "Pencemaran & Masalah",
+      chapter: "Bab 04",
+      chapterLink: "#pencemaran",
+      def: "Beban kerugian atau biaya ekologis akibat aktivitas suatu pihak yang tidak dibayar oleh pihak tersebut, melainkan ditanggung oleh pihak lain atau ekosistem.",
+      cmc: "Wisatawan yang membuang sampah sembarangan menikmati kenyamanan rekreasi tanpa biaya, sementara ranger dan nelayan menanggung beban pembersihan serta rusaknya biota perairan."
+    },
+    {
+      id: "homeostasis",
+      term: "Homeostasis Ekologis",
+      en: "Ecological Homeostasis / Resilience",
+      letter: "H",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 01",
+      chapterLink: "#konsep",
+      def: "Mekanisme keseimbangan dinamis alami yang dimiliki ekosistem untuk menstabilkan diri dari gangguan fisik lingkungan hingga batas toleransi tertentu.",
+      cmc: "Kemampuan mangrove meredam salinitas dan menyaring endapan lumpur dari sungai agar air di terumbu karang tetap jernih."
+    },
+    {
+      id: "internalisasi-eksternalitas",
+      term: "Internalisasi Eksternalitas",
+      en: "Internalization of Externalities",
+      letter: "I",
+      category: "pencemaran",
+      categoryLabel: "Pencemaran & Masalah",
+      chapter: "Bab 04",
+      chapterLink: "#pencemaran",
+      def: "Tindakan mengubah biaya eksternal menjadi biaya internal bagi pembuat keputusan atau perusak lingkungan melalui regulasi, sistem deposit, atau denda langsung.",
+      cmc: "Sistem denda Rp 100.000 per lembar sampah hilang dan pemeriksaan checklist barang saat keluar CMC memaksa wisatawan bertanggung jawab atas setiap sampah yang mereka bawa."
+    },
+    {
+      id: "intrusi-air-laut",
+      term: "Intrusi Air Laut",
+      en: "Saltwater Intrusion",
+      letter: "I",
+      category: "pencemaran",
+      categoryLabel: "Pencemaran & Masalah",
+      chapter: "Bab 04",
+      chapterLink: "#pencemaran",
+      def: "Menyusupnya air laut asin ke dalam lapisan pori tanah dan air tanah tawar akibat rusaknya perakaran mangrove pesisir atau ekstraksi air tanah berlebih.",
+      cmc: "Ketika hutan mangrove gundul pra-2012, sumur-sumur air minum warga Desa Tambakrejo terasa asin payau karena air laut leluasa meresap ke daratan."
+    },
+    {
+      id: "jejak-ekologis",
+      term: "Jejak Ekologis (Ecological Footprint)",
+      en: "Ecological Footprint",
+      letter: "J",
+      category: "daya-dukung",
+      categoryLabel: "Daya Dukung & Jejak",
+      chapter: "Bab 03",
+      chapterLink: "#daya-dukung",
+      def: "Ukuran luasan permukaan biologis bumi yang diperlukan untuk menghasilkan segala kebutuhan konsumsi manusia dan menyerap seluruh limbah yang ditimbulkannya.",
+      cmc: "Komponen jejak ekologis yang paling dikontrol ketat di pintu masuk CMC adalah Waste Footprint (jejak sampah anorganik kemasan)."
+    },
+    {
+      id: "komponen-abiotik",
+      term: "Komponen Abiotik",
+      en: "Abiotic Components",
+      letter: "K",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 01",
+      chapterLink: "#konsep",
+      def: "Faktor tak hidup lingkungan (suhu, salinitas, tipe substrat tanah/pasir, cahaya matahari, dan siklus pasang surut) yang memengaruhi persebaran makhluk hidup.",
+      cmc: "Jadwal pasang surut air laut Sendang Biru menjadi kendala alami (natural constraint) yang menentukan jadwal ideal penanaman propagul mangrove."
+    },
+    {
+      id: "komponen-biotik",
+      term: "Komponen Biotik",
+      en: "Biotic Components",
+      letter: "K",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 01",
+      chapterLink: "#konsep",
+      def: "Semua bentuk organisme hidup dalam sistem lingkungan yang terdiri atas organisme autotrof (produsen), heterotrof (konsumen), dan mikrobia pengurai.",
+      cmc: "Keanekaragaman 32 jenis mangrove, ikan terumbu, teripang, kepiting, serta koloni karang di 6 pantai binaan CMC."
+    },
+    {
+      id: "komponen-sosial",
+      term: "Komponen Sosial",
+      en: "Social & Cultural Dimension",
+      letter: "K",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 01",
+      chapterLink: "#konsep",
+      def: "Faktor manusia, kelembagaan masyarakat, hukum formal, kearifan lokal, dan norma adat yang mengatur bagaimana manusia mengelola alam sekitarnya.",
+      cmc: "Kelompok Masyarakat Pengawas (Pokmaswas) dan warga nelayan Sendang Biru yang bersatu membuat aturan perlindungan kawasan pesisir secara swadaya."
+    },
+    {
+      id: "konservasi-insitu",
+      term: "Konservasi In-Situ & Ex-Situ",
+      en: "In-Situ & Ex-Situ Conservation",
+      letter: "K",
+      category: "konservasi",
+      categoryLabel: "Konservasi & Solusi",
+      chapter: "Bab 05",
+      chapterLink: "#konservasi",
+      def: "In-situ adalah pelestarian keanekaragaman hayati langsung di habitat aslinya; sedangkan Ex-situ adalah pelestarian di luar habitat alaminya (misal: kebun raya atau penangkaran buatan).",
+      cmc: "CMC memadukan perlindungan in-situ di Teluk Tiga Warna dengan fasilitas ex-situ Rumah Bibit Mangrove untuk menyemai benih sebelum ditanam kembali."
+    },
+    {
+      id: "mikroplastik",
+      term: "Mikroplastik",
+      en: "Microplastics (< 5mm)",
+      letter: "M",
+      category: "pencemaran",
+      categoryLabel: "Pencemaran & Masalah",
+      chapter: "Bab 04",
+      chapterLink: "#pencemaran",
+      def: "Serpihan partikel plastik berukuran di bawah 5 mm hasil pelapukan sampah plastik makro oleh sinar UV dan gilingan ombak laut yang sangat sulit diurai alam.",
+      cmc: "Ancaman polusi lintas batas (sea-based pollution) yang terbawa arus laut Samudra Hindia dan berisiko terperangkap pada perakaran mangrove Clungup."
+    },
+    {
+      id: "mangrove",
+      term: "Mangrove",
+      en: "Mangrove Forest / Halophytes",
+      letter: "M",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Tumbuhan berkayu halofit yang hidup di kawasan perairan payau dan intertidal pasang surut laut, memiliki adaptasi fisiologis untuk mengatasi salinitas dan substrat anoksik.",
+      cmc: "Hutan mangrove seluas lebih dari 80 hektar di pesisir Sendang Biru yang berfungsi sebagai penahan abrasi, perangkap sedimen, dan penyimpan karbon."
+    },
+    {
+      id: "padang-lamun",
+      term: "Padang Lamun (Seagrass Bed)",
+      en: "Seagrass Meadow",
+      letter: "P",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Tumbuhan berbunga sejati (angiospermae) yang sepenuhnya hidup terbenam di dasar perairan laut dangkal berpasir, membentuk padang hijau luas dengan rimpang kokoh.",
+      cmc: "Ditemukan di perairan antara Pantai Gatra dan Clungup; menyaring partikel tersuspensi sehingga air laut tetap jernih sebelum menuju terumbu karang Tiga Warna."
+    },
+    {
+      id: "pneumatofora",
+      term: "Pneumatofora (Akar Napas)",
+      en: "Pneumatophores / Breathing Roots",
+      letter: "P",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Akar pensil mangrove (seperti pada Avicennia dan Sonneratia) yang tumbuh mencuat ke atas permukaan lumpur untuk menyerap udara atmosfer melalui pori lentisel.",
+      cmc: "Bila tertutup sampah plastik kresek yang tersangkut, proses respirasi pohon akan terhenti dan memicu kematian massal tegakan mangrove."
+    },
+    {
+      id: "propagul",
+      term: "Propagul",
+      en: "Viviparous Seedlings / Propagules",
+      letter: "P",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Benih mangrove yang telah berkecambah dan tumbuh memanjang menjadi calon bibit saat masih menggantung di dahan pohon induknya (sifat vivipari).",
+      cmc: "Dipetik selektif oleh pengelola CMC dan dibesarkan di polybag Rumah Bibit sebelum ditanam bersama wisatawan dan mahasiswa."
+    },
+    {
+      id: "resiliensi-sosio-ekologis",
+      term: "Resiliensi Sosio-Ekologis",
+      en: "Social-Ecological Resilience",
+      letter: "R",
+      category: "pembangunan",
+      categoryLabel: "Pembangunan Berkelanjutan",
+      chapter: "Bab 06",
+      chapterLink: "#pembangunan",
+      def: "Ketahanan terintegrasi antara masyarakat dan ekosistemnya dalam menghadapi krisis iklim atau goncangan ekonomi serta beradaptasi untuk bangkit lebih kuat.",
+      cmc: "Dengan mangrove yang pulih, nelayan Desa Tambakrejo terlindung dari badai rob dan memiliki sumber nafkah alternatif melalui ekowisata saat musim angin barat."
+    },
+    {
+      id: "rhizophora",
+      term: "Rhizophora mucronata (Bakau Hitam)",
+      en: "Stilt-rooted Red/Black Mangrove",
+      letter: "R",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Spesies mangrove dengan perakaran tunjang kokoh yang mencengkeram tanah berlumpur tebal dan efisien dalam memerangkap sedimen serta memecah hempasan ombak.",
+      cmc: "Spesies paling dominan yang ditanam di sepanjang laguna Pantai Clungup dengan biomassa penyimpanan karbon yang sangat besar."
+    },
+    {
+      id: "rumah-bibit",
+      term: "Rumah Bibit Mangrove",
+      en: "Mangrove Nursery Facility",
+      letter: "R",
+      category: "konservasi",
+      categoryLabel: "Konservasi & Solusi",
+      chapter: "Bab 05",
+      chapterLink: "#konservasi",
+      def: "Fasilitas persemaian bibit di bawah naungan paranet untuk membesarkan propagul menjadi bibit kuat siap tanam dengan tingkat keberhasilan hidup lebih dari 85%.",
+      cmc: "Fasilitas Rumah Bibit di Pantai Clungup memproduksi ribuan bibit bakau per tahun untuk kebutuhan restorasi pesisir dan adopsi mangrove."
+    },
+    {
+      id: "sedimen-anaerob",
+      term: "Sedimen Anaerob",
+      en: "Anaerobic Coastal Mud Sinks",
+      letter: "S",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Lapisan lumpur dasar perairan pasang surut yang jenuh air dan tanpa oksigen, mencegah dekomposer membusukkan bahan organik sehingga karbon terkunci berabad-abad.",
+      cmc: "Kunci utama efisiensi blue carbon di CMC: karbon tersimpan bukan hanya di kayu pohon, melainkan di lapisan sedimen anaerob berlumpur pekat di bawahnya."
+    },
+    {
+      id: "silvofishery",
+      term: "Silvofishery (Wana Mina)",
+      en: "Mangrove-Friendly Aquaculture",
+      letter: "S",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Sistem budidaya tambak perikanan ramah lingkungan yang memadukan pemeliharaan ikan/kepiting dengan pelestarian tegakan pohon mangrove di saluran air.",
+      cmc: "Diterapkan di kawasan penyangga Pantai Clungup agar warga tetap memiliki panen tambak tanpa harus membabat habis pohon mangrove penahan abrasi."
+    },
+    {
+      id: "sistem-checklist",
+      term: "Sistem Checklist Sampah",
+      en: "Zero-Waste Luggage Inspection Policy",
+      letter: "S",
+      category: "konservasi",
+      categoryLabel: "Konservasi & Solusi",
+      chapter: "Bab 05",
+      chapterLink: "#konservasi",
+      def: "Prosedur operasional audit sampah di mana ranger menghitung dan mencatat seluruh kemasan barang bawaan pengunjung di pos masuk, lalu dicek ulang saat pulang.",
+      cmc: "Aturan ikonik CMC sejak 2014: denda Rp 100.000 untuk setiap item sampah yang hilang terbukti efektif menjaga pantai tetap bersih tanpa sampah berserakan."
+    },
+    {
+      id: "sdgs",
+      term: "Sustainable Development Goals (SDGs)",
+      en: "Tujuan Pembangunan Berkelanjutan (TPB)",
+      letter: "S",
+      category: "pembangunan",
+      categoryLabel: "Pembangunan Berkelanjutan",
+      chapter: "Bab 06",
+      chapterLink: "#pembangunan",
+      def: "Tujuh belas sasaran global agenda 2030 PBB untuk mewujudkan perdamaian dan kemakmuran bagi manusia dan planet bumi di masa sekarang maupun masa depan.",
+      cmc: "CMC menjadi bukti riil pencapaian SDG 14 (Ekosistem Lautan), SDG 13 (Penanganan Perubahan Iklim), dan SDG 8 (Pekerjaan Layak & Pertumbuhan Ekonomi Lokal)."
+    },
+    {
+      id: "terumbu-karang",
+      term: "Terumbu Karang",
+      en: "Coral Reefs",
+      letter: "T",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Struktur kalsium karbonat bawah air yang dibangun oleh polip karang kecil yang hidup bersimbiosis mutualisme dengan mikroalga fotosintetik zooxanthellae.",
+      cmc: "Terumbu karang di Teluk Pantai Tiga Warna menjadi habitat nemo dan ikan karang yang dijaga dengan kuota snorkeling dan pelampung wajib."
+    },
+    {
+      id: "tcc",
+      term: "Tourism Carrying Capacity (TCC)",
+      en: "Daya Dukung Pariwisata",
+      letter: "T",
+      category: "daya-dukung",
+      categoryLabel: "Daya Dukung & Jejak",
+      chapter: "Bab 03",
+      chapterLink: "#daya-dukung",
+      def: "Batas maksimal jumlah pelancong yang dapat ditolerir oleh suatu destinasi tanpa menyebabkan degradasi lingkungan dan tanpa mengurangi kepuasan pengalaman rekreasi.",
+      cmc: "Di Pantai Tiga Warna dibatasi maksimal 100 orang per sesi 2 jam dengan kuota harian ketat untuk mencegah karang terinjak dan pasir tercemar."
+    },
+    {
+      id: "triple-bottom-line",
+      term: "Triple Bottom Line (TBL)",
+      en: "Planet, Profit, People",
+      letter: "T",
+      category: "pembangunan",
+      categoryLabel: "Pembangunan Berkelanjutan",
+      chapter: "Bab 06",
+      chapterLink: "#pembangunan",
+      def: "Konsep pembangunan berkelanjutan yang menyeimbangkan tiga pilar yang saling menopang: kelestarian lingkungan (Planet), keuntungan ekonomi (Profit), dan keadilan sosial (People).",
+      cmc: "Ekologi mangrove pulih (Planet) menghasilkan perputaran ekonomi ekowisata miliaran rupiah (Profit) yang menyejahterakan warga Tambakrejo dan meredam konflik (People)."
+    },
+    {
+      id: "zonasi-spasial",
+      term: "Zonasi Spasial Kawasan",
+      en: "Spatial Conservation Zoning",
+      letter: "Z",
+      category: "daya-dukung",
+      categoryLabel: "Daya Dukung & Jejak",
+      chapter: "Bab 03",
+      chapterLink: "#daya-dukung",
+      def: "Pembagian ruang tata kelola konservasi berdasarkan fungsi peruntukan dan kerentanan ekologi: Zona Inti (perlindungan total), Zona Pemanfaatan Terbatas, dan Zona Pemanfaatan Intensif.",
+      cmc: "Pantai Gatra dikhususkan sebagai satu-satunya zona berkemah (lokalisasi dampak), Pantai Tiga Warna untuk snorkeling kuota, dan Pantai Clungup untuk suaka mangrove."
+    },
+    {
+      id: "zooxanthellae",
+      term: "Zooxanthellae & Coral Bleaching",
+      en: "Symbiotic Algae & Coral Bleaching",
+      letter: "Z",
+      category: "ekosistem",
+      categoryLabel: "Ekosistem & Pesisir",
+      chapter: "Bab 02",
+      chapterLink: "#ekosistem",
+      def: "Zooxanthellae adalah mikroalga bersel satu simbiotik penyuplai makanan bagi polip karang; bila suhu laut meningkat drastis, alga keluar menyebabkan karang memutih (bleaching) dan mati.",
+      cmc: "Ranger CMC rutin memantau kejernihan dan temperatur perairan di Tiga Warna untuk memastikan koloni karang tidak mengalami pemutihan massal."
+    }
+  ];
+
+  let glossaryState = {
+    query: '',
+    category: 'all',
+    letter: 'all'
+  };
+
+  function renderGlossary() {
+    const grid = document.getElementById('glossaryGrid');
+    const empty = document.getElementById('glossaryEmpty');
+    const countBadge = document.getElementById('glossaryShowingCount');
+    const filterDesc = document.getElementById('glossaryActiveFilterDesc');
+    const resetBtn = document.getElementById('glossaryResetBtn');
+    const clearBtn = document.getElementById('glossaryClearBtn');
+    const searchInput = document.getElementById('glossarySearchInput');
+
+    if (!grid) return;
+
+    if (clearBtn && searchInput) {
+      clearBtn.style.display = searchInput.value ? 'block' : 'none';
+    }
+
+    const q = glossaryState.query.trim().toLowerCase();
+
+    const filtered = GLOSSARY_DATA.filter(item => {
+      if (glossaryState.category !== 'all' && item.category !== glossaryState.category) {
+        return false;
+      }
+      if (glossaryState.letter !== 'all' && item.letter !== glossaryState.letter) {
+        return false;
+      }
+      if (q) {
+        const matchTerm = item.term.toLowerCase().includes(q);
+        const matchEn = item.en.toLowerCase().includes(q);
+        const matchDef = item.def.toLowerCase().includes(q);
+        const matchCmc = item.cmc.toLowerCase().includes(q);
+        const matchCat = item.categoryLabel.toLowerCase().includes(q);
+        return matchTerm || matchEn || matchDef || matchCmc || matchCat;
+      }
+      return true;
+    });
+
+    if (countBadge) countBadge.innerText = `${filtered.length} dari ${GLOSSARY_DATA.length} Istilah`;
+
+    let descParts = [];
+    if (glossaryState.category !== 'all') {
+      const activeChip = document.querySelector(`.glossary-chip[data-cat="${glossaryState.category}"]`);
+      if (activeChip) descParts.push(`Kategori: ${activeChip.innerText.replace(/^[^\s]+\s/, '')}`);
+    }
+    if (glossaryState.letter !== 'all') {
+      descParts.push(`Huruf: ${glossaryState.letter}`);
+    }
+    if (q) {
+      descParts.push(`Pencarian: "${glossaryState.query}"`);
+    }
+
+    if (filterDesc) filterDesc.innerText = descParts.length > 0 ? `(${descParts.join(' · ')})` : '';
+    if (resetBtn) resetBtn.style.display = descParts.length > 0 ? 'inline-block' : 'none';
+
+    if (filtered.length === 0) {
+      grid.style.display = 'none';
+      if (empty) empty.style.display = 'block';
+      const emptyMsg = document.getElementById('glossaryEmptyMsg');
+      if (emptyMsg) {
+        emptyMsg.innerText = q ? `Tidak ditemukan istilah yang cocok dengan kata kunci "${glossaryState.query}".` : 'Tidak ada istilah dalam kategori atau huruf ini.';
+      }
+    } else {
+      if (empty) empty.style.display = 'none';
+      grid.style.display = 'grid';
+
+      grid.innerHTML = filtered.map(item => {
+        return `
+          <div class="glossary-card" data-cat="${item.category}">
+            <div class="glossary-card-top">
+              <div class="glossary-badge-line">
+                <span class="glossary-cat-tag">${item.categoryLabel}</span>
+                <a href="${item.chapterLink}" class="glossary-chapter-pill" title="Lompat ke materi ${item.chapter}">${item.chapter} ↗</a>
+              </div>
+              <h3 class="glossary-term-title">${item.term}</h3>
+              <div class="glossary-term-en">${item.en}</div>
+              <p class="glossary-desc">${item.def}</p>
+            </div>
+            <div class="glossary-cmc-box">
+              <strong>📍 Konteks CMC:</strong> ${item.cmc}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    updateAzBarState();
+  }
+
+  function renderGlossaryAzBar() {
+    const azContainer = document.getElementById('glossaryAzBar');
+    if (!azContainer) return;
+
+    const availableLetters = new Set(GLOSSARY_DATA.map(item => item.letter));
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+    let buttonsHtml = `
+      <span class="glossary-az-label">Abjad:</span>
+      <button type="button" class="glossary-az-btn ${glossaryState.letter === 'all' ? 'active' : ''}" onclick="filterGlossaryLetter('all', this)">SEMUA</button>
+    `;
+
+    alphabet.forEach(char => {
+      const hasLetter = availableLetters.has(char);
+      const isActive = glossaryState.letter === char;
+      const disabledClass = hasLetter ? '' : 'disabled';
+      buttonsHtml += `
+        <button type="button" class="glossary-az-btn ${isActive ? 'active' : ''} ${disabledClass}" onclick="filterGlossaryLetter('${char}', this)" ${!hasLetter ? 'disabled' : ''}>${char}</button>
+      `;
+    });
+
+    azContainer.innerHTML = buttonsHtml;
+  }
+
+  function updateAzBarState() {
+    const buttons = document.querySelectorAll('.glossary-az-btn');
+    buttons.forEach(btn => {
+      const letter = btn.innerText;
+      if (letter === 'SEMUA') {
+        btn.classList.toggle('active', glossaryState.letter === 'all');
+      } else {
+        btn.classList.toggle('active', glossaryState.letter === letter);
+      }
+    });
+  }
+
+  function handleGlossarySearch() {
+    const input = document.getElementById('glossarySearchInput');
+    if (!input) return;
+    glossaryState.query = input.value;
+    renderGlossary();
+  }
+
+  function clearGlossarySearch() {
+    const input = document.getElementById('glossarySearchInput');
+    if (input) input.value = '';
+    glossaryState.query = '';
+    renderGlossary();
+    if (input) input.focus();
+  }
+
+  function filterGlossaryCategory(cat, btn) {
+    glossaryState.category = cat;
+    document.querySelectorAll('.glossary-cat-chips .glossary-chip').forEach(c => c.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderGlossary();
+  }
+
+  function filterGlossaryLetter(letter, btn) {
+    glossaryState.letter = letter;
+    renderGlossary();
+  }
+
+  function resetAllGlossaryFilters() {
+    glossaryState.query = '';
+    glossaryState.category = 'all';
+    glossaryState.letter = 'all';
+
+    const searchInput = document.getElementById('glossarySearchInput');
+    if (searchInput) searchInput.value = '';
+
+    document.querySelectorAll('.glossary-cat-chips .glossary-chip').forEach(c => {
+      c.classList.toggle('active', c.getAttribute('data-cat') === 'all');
+    });
+
+    renderGlossary();
+  }
+
+  function initGlossary() {
+    renderGlossaryAzBar();
+    renderGlossary();
+  }
+
+  // Inisialisasi Kuis dan Glosarium saat Halaman Dimuat
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCvcQuiz();
+      initGlossary();
+    });
+  } else {
+    renderCvcQuiz();
+    initGlossary();
   }
 </script>
 <script src="ai-assistant.js"></script>
